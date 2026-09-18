@@ -37,6 +37,10 @@ Das ist der **interne Urlaubsantrag**, kein Teil der öffentlichen Seite.
 - **Die echte Adresse gehört nicht in dieses öffentliche Projekt.** Sie kommt als
   GitHub-Secret `ZAPIER_URLAUB` hinein und wird im Livegang-Ablauf eingesetzt.
   Dazu im KAS ein Verzeichnisschutz auf `/urlaub`.
+- Secret anlegen: Projekt -> **Settings** -> **Secrets and variables** -> **Actions** ->
+  **New repository secret** -> Name `ZAPIER_URLAUB`, Wert die Adresse aus Zapier
+  (Zap „Urlaubsantrag Webseite -> Asana“, Schritt 1, „Your webhook URL“). Ovidiu hat sie.
+- Fehlt das Secret, laesst der Livegang-Ablauf den Ordner `urlaub/` bewusst weg.
 
 ## Regeln
 

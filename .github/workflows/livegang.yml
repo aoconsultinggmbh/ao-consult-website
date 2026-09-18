@@ -59,6 +59,23 @@ jobs:
         if: steps.pruefen.outputs.bereit == 'ja'
         uses: actions/checkout@v4
 
+      - name: Urlaubsantrag, Zapier-Adresse aus dem Secret einsetzen
+        if: steps.pruefen.outputs.bereit == 'ja'
+        env:
+          ZAPIER_URLAUB: ${{ secrets.ZAPIER_URLAUB }}
+        run: |
+          # Die Adresse des Zapier-Empfaengers steht nicht im oeffentlichen Projekt,
+          # sondern im Secret ZAPIER_URLAUB. Hier wird sie in die Seite geschrieben,
+          # bevor die Dateien zum Hoster gehen. Fehlt das Secret, geht der Ordner
+          # urlaub/ NICHT mit hoch, damit kein Formular ohne Empfaenger live liegt.
+          if [ -n "$ZAPIER_URLAUB" ]; then
+            sed -i "s|ZAPIER_HOOK_URL_HIER_EINTRAGEN|$ZAPIER_URLAUB|" website/urlaub/index.html
+            grep -q "hooks.zapier.com" website/urlaub/index.html && echo "Zapier-Adresse eingesetzt."
+          else
+            echo "::warning::Secret ZAPIER_URLAUB fehlt. Der Ordner website/urlaub wird beim Livegang ausgelassen. Siehe README, Abschnitt Urlaubsantrag."
+            rm -rf website/urlaub
+          fi
+
       - name: Auf den Server hochladen (FTPS)
         if: steps.pruefen.outputs.bereit == 'ja'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
