@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /urlaub/
+Disallow: /willkommen/
 
 Sitemap: https://ao-consult.de/sitemap.xml
-Disallow: /willkommen/
