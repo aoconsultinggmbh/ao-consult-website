@@ -1,0 +1,70 @@
+# ---------------------------------------------------------------------------
+# Vorschau-Adresse (GitHub Pages)
+#
+# Was passiert hier: Jedes Mal, wenn sich etwas im Ordner "website/" ändert,
+# baut GitHub daraus automatisch die Vorschau-Seite neu und stellt sie unter
+# https://<firmenprofil>.github.io/ao-consult-website/ bereit.
+#
+# Die Vorschau ist NICHT die echte Webseite. Deshalb bekommt jede Seite hier
+# einen "noindex"-Hinweis, damit Google die Vorschau nicht in die Suche nimmt.
+# Auf dem echten Server (siehe livegang.yml) passiert das nicht.
+# ---------------------------------------------------------------------------
+name: Vorschau veroeffentlichen
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/vorschau.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  bauen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dateien holen
+        uses: actions/checkout@v4
+
+      - name: Vorschau-Version bauen (noindex einfuegen)
+        run: |
+          rm -rf _vorschau && cp -r website _vorschau
+          # Der Urlaubsantrag gehoert NICHT in die oeffentliche Vorschau.
+          # Er ist erst live sinnvoll, dort hinter Verzeichnisschutz im KAS.
+          rm -rf _vorschau/urlaub
+          # Jede HTML-Seite: Suchmaschinen aussperren
+          while IFS= read -r f; do
+            # vorhandenen robots-Hinweis ersetzen ...
+            sed -i 's|<meta name="robots" content="[^"]*">|<meta name="robots" content="noindex, nofollow">|' "$f"
+            # ... und falls keiner da war, einen einfuegen
+            grep -q 'name="robots"' "$f" || sed -i 's|<head>|<head>\n  <meta name="robots" content="noindex, nofollow">|' "$f"
+          done < <(find _vorschau -name "*.html")
+          # robots.txt der Vorschau: alles sperren, keine Sitemap
+          printf 'User-agent: *\nDisallow: /\n' > _vorschau/robots.txt
+          rm -f _vorschau/sitemap.xml
+          echo "Vorschau gebaut:"; ls _vorschau
+
+      - name: Fuer Pages verpacken
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _vorschau
+
+  veroeffentlichen:
+    needs: bauen
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veroeffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v4

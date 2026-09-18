@@ -1,0 +1,74 @@
+# ---------------------------------------------------------------------------
+# Livegang: Webseite auf den echten Server hochladen (deutscher Hoster)
+#
+# Was passiert hier: Dieser Ablauf reagiert NUR auf den Zweig "live".
+# Änderungen landen zuerst auf "main" (= Vorschau). Erst wenn jemand die
+# Änderung freigibt ("main" nach "live" übernehmen), lädt GitHub die Dateien
+# per verschlüsseltem FTP (FTPS) auf den echten Webserver.
+# Nur Dateien, die sich geändert haben, werden übertragen.
+#
+# Freigabe durch Claude: "Gib die Änderungen bei Puchmayr frei" -> Claude
+# übernimmt main nach live. Von Hand: Reiter "Pull requests" -> New ->
+# base: live, compare: main -> Merge.
+#
+# Damit das läuft, müssen im Projekt drei "Secrets" hinterlegt sein
+# (GitHub → Settings → Secrets and variables → Actions → New repository secret):
+#
+#   FTP_SERVER     z. B.  w01a2b3c.kasserver.com   (All-Inkl)  oder  www123.your-server.de (Hetzner)
+#   FTP_BENUTZER   der FTP-Benutzername vom Hoster
+#   FTP_PASSWORT   das dazugehörige Passwort
+#   FTP_ORDNER     Zielordner auf dem Server, z. B.  /www.ao-consult.de/   oder  /public_html/
+#
+# Solange die Secrets fehlen, macht dieser Ablauf nichts und meldet das nur.
+# Anleitung in leichter Sprache: doku/livegang-anleitung.md
+# ---------------------------------------------------------------------------
+name: Livegang (Upload zum Hoster)
+
+on:
+  push:
+    branches: [live]
+    paths:
+      - "website/**"
+      - ".github/workflows/livegang.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: livegang
+  cancel-in-progress: false
+
+jobs:
+  hochladen:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - name: Pruefen, ob der Hoster schon eingerichtet ist
+        id: pruefen
+        run: |
+          if [ -z "$FTP_SERVER" ]; then
+            echo "::notice::Noch kein Hoster hinterlegt (Secret FTP_SERVER fehlt). Upload wird uebersprungen. Siehe doku/livegang-anleitung.md"
+            echo "bereit=nein" >> "$GITHUB_OUTPUT"
+          else
+            echo "bereit=ja" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dateien holen
+        if: steps.pruefen.outputs.bereit == 'ja'
+        uses: actions/checkout@v4
+
+      - name: Auf den Server hochladen (FTPS)
+        if: steps.pruefen.outputs.bereit == 'ja'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_BENUTZER }}
+          password: ${{ secrets.FTP_PASSWORT }}
+          protocol: ftps
+          local-dir: ./website/
+          server-dir: ${{ secrets.FTP_ORDNER }}
+          exclude: |
+            **/.DS_Store
+            **/_alte-dateinamen/**

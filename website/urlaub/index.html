@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2b87da">
+<title>Urlaubsantrag | AO Consulting</title>
+<meta name="description" content="Interner Urlaubsantrag für Mitarbeitende der AO Consulting GmbH.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --blau:#2b87da;--blau-dunkel:#1f6bb0;--blau-hell:#e8f2fc;
+  --text:#1c2733;--text-leise:#5a6b7c;--linie:#d9e1ea;--flaeche:#f5f8fb;--weiss:#fff;
+  --fehler:#b3261e;--ok:#1b7f4b;
+  --radius:14px;--schatten:0 6px 24px rgba(28,39,51,.08);
+}
+*{box-sizing:border-box}
+html{font-size:100%}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:1.0625rem;line-height:1.55;color:var(--text);background:var(--flaeche)}
+img{height:auto;max-width:100%}
+a{color:var(--blau)}
+:focus:not(:focus-visible){outline:none}
+:focus-visible{outline:3px solid var(--blau);outline-offset:2px}
+.sprung{position:absolute;left:-999px;top:0;background:var(--blau);color:#fff;padding:.6rem 1rem;border-radius:0 0 8px 0;z-index:10}
+.sprung:focus{left:0}
+
+body>header{background:var(--weiss);border-bottom:1px solid var(--linie)}
+.kopf{max-width:1100px;margin:0 auto;padding:.9rem 1rem;display:flex;align-items:center;gap:1rem;justify-content:space-between}
+.marke{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:var(--text);font-weight:700;letter-spacing:.01em;white-space:nowrap}
+.marke svg{width:40px;height:40px;flex:none}
+.intern{font-size:.85rem;color:var(--text-leise);background:var(--blau-hell);padding:.3rem .7rem;border-radius:999px;white-space:nowrap}
+
+main{max-width:1100px;margin:0 auto;padding:2rem 1rem 3rem;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:1.5rem;align-items:start}
+@media (max-width:860px){main{grid-template-columns:1fr}}
+
+.karte{background:var(--weiss);border-radius:var(--radius);box-shadow:var(--schatten);padding:1.6rem}
+h1{font-size:clamp(1.6rem,2.6vw,2.1rem);line-height:1.2;margin:0 0 .4rem}
+.lead{color:var(--text-leise);margin:0 0 1.4rem}
+h2{font-size:1.15rem;margin:0 0 .8rem}
+h3{font-size:1rem;margin:1rem 0 .3rem}
+
+fieldset{border:0;padding:0;margin:0 0 1.2rem}
+legend{font-weight:700;font-size:1rem;margin-bottom:.6rem;padding:0}
+.reihe{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media (max-width:520px){.reihe{grid-template-columns:1fr}}
+label{display:block;font-weight:600;font-size:.95rem;margin-bottom:.3rem}
+.hinweis{display:block;font-weight:400;color:var(--text-leise);font-size:.85rem;margin-top:.2rem}
+input[type=text],input[type=email],input[type=date],textarea{
+  width:100%;min-height:48px;padding:.65rem .8rem;border:1px solid var(--linie);border-radius:10px;font:inherit;color:var(--text);background:#fff}
+textarea{min-height:110px;resize:vertical}
+input:invalid[data-beruehrt],textarea:invalid[data-beruehrt]{border-color:var(--fehler)}
+.pflicht{color:var(--fehler)}
+
+.radios{display:flex;flex-wrap:wrap;gap:.5rem}
+.radios label{display:flex;align-items:center;gap:.5rem;font-weight:500;border:1px solid var(--linie);border-radius:999px;padding:.55rem .9rem;min-height:44px;cursor:pointer;margin:0;white-space:nowrap}
+.radios input{accent-color:var(--blau);width:1.1rem;height:1.1rem;margin:0}
+.radios label:has(input:checked){border-color:var(--blau);background:var(--blau-hell)}
+[hidden]{display:none !important}
+
+.rechner{background:var(--blau-hell);border-radius:12px;padding:1rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
+.rechner strong{font-size:1.9rem;line-height:1;color:var(--blau-dunkel)}
+.rechner .klein{font-size:.85rem;color:var(--text-leise);margin-top:.15rem}
+.rechner ul{margin:.3rem 0 0;padding-left:1.1rem;font-size:.85rem;color:var(--text-leise)}
+
+.check{display:flex;gap:.7rem;align-items:flex-start;font-weight:400;font-size:.95rem}
+.check input{width:1.2rem;height:1.2rem;margin-top:.2rem;accent-color:var(--blau);flex:none}
+
+.knopf{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:50px;padding:.8rem 1.6rem;border:0;border-radius:999px;background:var(--blau);color:#fff;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+.knopf:hover,.knopf:focus-visible{background:var(--blau-dunkel);color:#fff}
+.knopf[disabled]{opacity:.6;cursor:wait}
+.meldung{margin-top:1rem;padding:.9rem 1rem;border-radius:10px;font-size:.95rem}
+.meldung--fehler{background:#fdecea;color:var(--fehler)}
+.meldung--ok{background:#e6f5ec;color:var(--ok)}
+
+.ablauf{list-style:none;padding:0;margin:0;counter-reset:s}
+.ablauf li{position:relative;padding-left:2.6rem;margin-bottom:1rem}
+.ablauf li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:-.05rem;width:1.9rem;height:1.9rem;border-radius:50%;background:var(--blau);color:#fff;font-weight:700;display:grid;place-items:center;font-size:.9rem}
+.ablauf strong{display:block}
+.ablauf span{color:var(--text-leise);font-size:.95rem}
+.datenschutz{font-size:.9rem;color:var(--text-leise)}
+
+.danke{text-align:center;padding:2rem 1rem}
+.danke svg{width:64px;height:64px;color:var(--ok);margin-bottom:.8rem}
+.danke h2{font-size:1.4rem}
+.zusammenfassung{text-align:left;background:var(--flaeche);border-radius:12px;padding:1rem 1.2rem;margin:1.2rem auto 0;max-width:520px;font-size:.95rem}
+.zusammenfassung dt{font-weight:700;margin-top:.5rem}
+.zusammenfassung dd{margin:0}
+
+body>footer{border-top:1px solid var(--linie);background:var(--weiss)}
+.fuss{max-width:1100px;margin:0 auto;padding:1.2rem 1rem;display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;justify-content:space-between;font-size:.9rem;color:var(--text-leise)}
+.fuss a{color:var(--text-leise)}
+.honig{position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden}
+@media (prefers-reduced-motion:no-preference){.karte{transition:box-shadow .2s}}
+</style>
+</head>
+<body>
+<a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+<header>
+  <div class="kopf">
+    <a class="marke" href="https://ao-consult.de/" aria-label="AO Consulting Startseite">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#2b87da"/><text x="20" y="26" text-anchor="middle" font-family="system-ui,Arial,sans-serif" font-weight="700" font-size="16" fill="#fff">AO</text></svg>
+      AO Consulting
+    </a>
+    <span class="intern">Interner Bereich</span>
+  </div>
+</header>
+
+<main id="inhalt">
+  <section class="karte" aria-labelledby="titel">
+    <h1 id="titel">Urlaub beantragen</h1>
+    <p class="lead">Fülle die Felder aus, die Urlaubstage werden automatisch gezählt. Wochenenden und Feiertage in Baden-Württemberg sind schon herausgerechnet.</p>
+
+    <form id="antrag" novalidate>
+      <fieldset>
+        <legend>Wer beantragt</legend>
+        <div class="reihe">
+          <div>
+            <label for="vorname">Vorname <span class="pflicht" aria-hidden="true">*</span></label>
+            <input id="vorname" name="vorname" type="text" required autocomplete="given-name">
+          </div>
+          <div>
+            <label for="nachname">Nachname <span class="pflicht" aria-hidden="true">*</span></label>
+            <input id="nachname" name="nachname" type="text" required autocomplete="family-name">
+          </div>
+        </div>
+        <div style="margin-top:1rem">
+          <label for="email">E-Mail-Adresse <span class="pflicht" aria-hidden="true">*</span>
+            <span class="hinweis">Dahin geht deine Rückmeldung. Darf auch die private Adresse sein.</span></label>
+          <input id="email" name="email" type="email" required autocomplete="email" inputmode="email">
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Zeitraum</legend>
+        <div class="reihe">
+          <div>
+            <label for="von">Erster Urlaubstag <span class="pflicht" aria-hidden="true">*</span></label>
+            <input id="von" name="von" type="date" required>
+          </div>
+          <div>
+            <label for="bis">Letzter Urlaubstag <span class="pflicht" aria-hidden="true">*</span>
+              <span class="hinweis">Bei einem einzelnen Tag dasselbe Datum.</span></label>
+            <input id="bis" name="bis" type="date" required>
+          </div>
+        </div>
+
+        <div id="halbertag-block" hidden style="margin-top:1rem">
+          <p id="halbertag-label" style="font-weight:600;font-size:.95rem;margin:0 0 .4rem">Ganzer oder halber Tag?</p>
+          <div class="radios" role="radiogroup" aria-labelledby="halbertag-label">
+            <label><input type="radio" name="halber_tag" value="" checked> Ganzer Tag</label>
+            <label><input type="radio" name="halber_tag" value="Halber Tag vormittags"> Halber Tag vormittags</label>
+            <label><input type="radio" name="halber_tag" value="Halber Tag nachmittags"> Halber Tag nachmittags</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="rechner" aria-live="polite">
+        <div>
+          <div style="font-weight:600">Beantragte Urlaubstage</div>
+          <div class="klein" id="rechner-detail">Bitte Zeitraum wählen.</div>
+          <ul id="feiertage-liste" hidden></ul>
+        </div>
+        <strong id="urlaubstage-anzeige">–</strong>
+      </div>
+
+      <fieldset>
+        <legend>Sonstiges</legend>
+        <label for="info">Wichtige Info <span class="hinweis">Optional. Zum Beispiel Vertretung oder Erreichbarkeit.</span></label>
+        <textarea id="info" name="info"></textarea>
+      </fieldset>
+
+      <fieldset>
+        <label class="check">
+          <input type="checkbox" id="datenschutz" required>
+          <span>Ich bin einverstanden, dass meine Angaben zur Bearbeitung des Urlaubsantrags an AO Consulting übermittelt und in unserer Aufgabenverwaltung (Asana) gespeichert werden. <span class="pflicht" aria-hidden="true">*</span></span>
+        </label>
+      </fieldset>
+
+      <div class="honig" aria-hidden="true">
+        <label for="firma">Firma</label>
+        <input id="firma" name="firma" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="knopf" type="submit" id="senden">Urlaubsantrag absenden</button>
+      <div id="meldung" role="alert"></div>
+    </form>
+
+    <div id="danke" class="danke" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>
+      <h2>Danke, dein Antrag ist eingegangen.</h2>
+      <p>Ovidiu prüft ihn und du bekommst eine Nachricht an die angegebene E-Mail-Adresse, sobald entschieden ist.</p>
+      <dl class="zusammenfassung" id="zusammenfassung"></dl>
+    </div>
+  </section>
+
+  <aside class="karte" aria-labelledby="ablauf-titel">
+    <h2 id="ablauf-titel">So geht es weiter</h2>
+    <ol class="ablauf">
+      <li><strong>Antrag geht ein</strong><span>Dein Antrag landet sofort in der Spalte „Neuer Urlaubsantrag" in Asana.</span></li>
+      <li><strong>Ovidiu entscheidet</strong><span>Er verschiebt den Antrag auf „Genehmigt" oder „Abgelehnt".</span></li>
+      <li><strong>Kalender wird gepflegt</strong><span>Bei Genehmigung wird der Urlaub automatisch in den Servicekalender eingetragen, der Kalender bleibt für Termine frei.</span></li>
+      <li><strong>Du bekommst Bescheid</strong><span>Die Rückmeldung kommt an die E-Mail-Adresse, die du oben eingetragen hast.</span></li>
+    </ol>
+    <h3>Halbe Tage</h3>
+    <p class="datenschutz">Trage als ersten und letzten Urlaubstag dasselbe Datum ein, dann kannst du vormittags oder nachmittags wählen. Es wird 0,5 Tag gezählt.</p>
+    <h3>Datenschutz</h3>
+    <p class="datenschutz">Diese Seite speichert nichts und zeigt keine Anträge an. Deine Angaben werden nur einmal übermittelt und in Asana für die Bearbeitung gespeichert. Fragen dazu an <a href="mailto:rieger@ao-consult.de">rieger@ao-consult.de</a>.</p>
+  </aside>
+</main>
+
+<footer>
+  <div class="fuss">
+    <span>AO Consulting GmbH · Interne Seite</span>
+    <span><a href="https://ao-consult.de/impressum/">Impressum</a> · <a href="https://ao-consult.de/datenschutz/">Datenschutz</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  // === Einstellungen ======================================================
+  // Adresse des Zapier-Empfaengers ("Catch Hook"). Solange hier der Platzhalter
+  // steht, verschickt die Seite nichts und zeigt nur die Zusammenfassung an.
+  var ZAPIER_HOOK_URL = 'ZAPIER_HOOK_URL_HIER_EINTRAGEN';
+
+  // === Feiertage Baden-Wuerttemberg ======================================
+  function ostersonntag(j){ // Gauss/Butcher
+    var a=j%19,b=Math.floor(j/100),c=j%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),
+        g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,
+        l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+        monat=Math.floor((h+l-7*m+114)/31),tag=((h+l-7*m+114)%31)+1;
+    return new Date(Date.UTC(j,monat-1,tag));
+  }
+  function plus(d,n){var x=new Date(d.getTime());x.setUTCDate(x.getUTCDate()+n);return x;}
+  function key(d){return d.toISOString().slice(0,10);}
+  function feiertageBW(j){
+    var o=ostersonntag(j),m={};
+    m[key(new Date(Date.UTC(j,0,1)))]='Neujahr';
+    m[key(new Date(Date.UTC(j,0,6)))]='Heilige Drei Könige';
+    m[key(plus(o,-2))]='Karfreitag';
+    m[key(plus(o,1))]='Ostermontag';
+    m[key(new Date(Date.UTC(j,4,1)))]='Tag der Arbeit';
+    m[key(plus(o,39))]='Christi Himmelfahrt';
+    m[key(plus(o,50))]='Pfingstmontag';
+    m[key(plus(o,60))]='Fronleichnam';
+    m[key(new Date(Date.UTC(j,9,3)))]='Tag der Deutschen Einheit';
+    m[key(new Date(Date.UTC(j,10,1)))]='Allerheiligen';
+    m[key(new Date(Date.UTC(j,11,25)))]='1. Weihnachtstag';
+    m[key(new Date(Date.UTC(j,11,26)))]='2. Weihnachtstag';
+    return m;
+  }
+  function parseISO(s){var p=s.split('-');return new Date(Date.UTC(+p[0],+p[1]-1,+p[2]));}
+  function deutsch(d){return ('0'+d.getUTCDate()).slice(-2)+'.'+('0'+(d.getUTCMonth()+1)).slice(-2)+'.'+d.getUTCFullYear();}
+
+  // Zaehlt Arbeitstage zwischen von und bis (beide inklusive).
+  function zaehle(vonISO,bisISO){
+    var von=parseISO(vonISO),bis=parseISO(bisISO),tage=0,wochenende=0,feier=[];
+    var ft={};[von.getUTCFullYear(),bis.getUTCFullYear()].forEach(function(j){Object.assign(ft,feiertageBW(j));});
+    for(var d=von;d<=bis;d=plus(d,1)){
+      var wt=d.getUTCDay();
+      if(wt===0||wt===6){wochenende++;continue;}
+      var k=key(d);
+      if(ft[k]){feier.push(ft[k]+' ('+deutsch(d)+')');continue;}
+      tage++;
+    }
+    return {tage:tage,wochenende:wochenende,feiertage:feier};
+  }
+
+  // === Formular ===========================================================
+  var f=document.getElementById('antrag'),von=f.von,bis=f.bis,
+      halbBlock=document.getElementById('halbertag-block'),
+      anzeige=document.getElementById('urlaubstage-anzeige'),
+      detail=document.getElementById('rechner-detail'),
+      ftListe=document.getElementById('feiertage-liste'),
+      meldung=document.getElementById('meldung'),
+      aktuell={tage:0,text:'0'};
+
+  var heute=new Date();heute.setHours(0,0,0,0);
+  von.min=bis.min=heute.toISOString().slice(0,10);
+
+  function halberTagWert(){var r=f.querySelector('input[name=halber_tag]:checked');return r?r.value:'';}
+
+  function rechne(){
+    ftListe.hidden=true;ftListe.innerHTML='';
+    if(!von.value||!bis.value){anzeige.textContent='–';detail.textContent='Bitte Zeitraum wählen.';halbBlock.hidden=true;aktuell={tage:0,text:'0'};return;}
+    if(bis.value<von.value){bis.value=von.value;}
+    var einTag=von.value===bis.value;
+    halbBlock.hidden=!einTag;
+    if(!einTag){f.querySelector('input[name=halber_tag][value=""]').checked=true;}
+    var e=zaehle(von.value,bis.value),t=e.tage;
+    if(einTag&&halberTagWert()&&t===1){t=0.5;}
+    aktuell={tage:t,text:String(t).replace('.',',')};
+    anzeige.textContent=aktuell.text;
+    var teile=[];
+    if(e.wochenende)teile.push(e.wochenende+' Wochenendtag'+(e.wochenende>1?'e':''));
+    if(e.feiertage.length)teile.push(e.feiertage.length+' Feiertag'+(e.feiertage.length>1?'e':''));
+    if(t===0){detail.textContent='In diesem Zeitraum liegt kein Arbeitstag.';}
+    else{detail.textContent=teile.length?'Nicht gezählt: '+teile.join(' und ')+'.':'Alle Tage im Zeitraum sind Arbeitstage.';}
+    if(e.feiertage.length){ftListe.hidden=false;e.feiertage.forEach(function(x){var li=document.createElement('li');li.textContent=x;ftListe.appendChild(li);});}
+  }
+  von.addEventListener('change',function(){if(!bis.value||bis.value<von.value)bis.value=von.value;rechne();});
+  bis.addEventListener('change',rechne);
+  f.addEventListener('change',function(ev){if(ev.target.name==='halber_tag')rechne();});
+  f.querySelectorAll('input,textarea').forEach(function(el){el.addEventListener('blur',function(){el.setAttribute('data-beruehrt','');});});
+
+  function zeige(text,art){meldung.className='meldung meldung--'+art;meldung.textContent=text;}
+
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();meldung.className='';meldung.textContent='';
+    f.querySelectorAll('input,textarea').forEach(function(el){el.setAttribute('data-beruehrt','');});
+    if(f.firma.value){return;} // Honigtopf: still verwerfen
+    if(!f.checkValidity()){zeige('Bitte fülle alle Pflichtfelder aus und bestätige den Datenschutzhinweis.','fehler');var first=f.querySelector(':invalid');if(first)first.focus();return;}
+    rechne();
+    if(aktuell.tage===0){zeige('In diesem Zeitraum liegt kein Arbeitstag. Bitte den Zeitraum prüfen.','fehler');von.focus();return;}
+
+    var vorname=f.vorname.value.trim(),nachname=f.nachname.value.trim(),
+        vonD=deutsch(parseISO(von.value)),bisD=deutsch(parseISO(bis.value)),
+        halb=halberTagWert(),info=f.info.value.trim(),
+        infoKomplett=[halb,info].filter(Boolean).join('. ');
+
+    var daten={
+      aufgabenname:'Urlaubsantrag '+vorname+' '+nachname,
+      vorname:vorname,nachname:nachname,name:vorname+' '+nachname,
+      email:f.email.value.trim(),
+      von:vonD,bis:bisD,von_iso:von.value,bis_iso:bis.value,
+      urlaubstage:aktuell.text,halber_tag:halb,info:info,
+      beschreibung:'Name: '+vorname+' '+nachname+'\nVon '+vonD+' bis '+bisD+'\nBeantragte Urlaubstage: '+aktuell.text+'\nVoraussichtlicher Resturlaub: \nE-Mail Adresse: '+f.email.value.trim()+'\nWichtige Info: '+infoKomplett,
+      quelle:'ao-consult.de/urlaub'
+    };
+
+    var knopf=document.getElementById('senden');knopf.disabled=true;knopf.textContent='Wird gesendet …';
+
+    function fertig(){
+      var dl=document.getElementById('zusammenfassung');dl.innerHTML='';
+      [['Name',daten.name],['Zeitraum',vonD+' bis '+bisD],['Urlaubstage',aktuell.text],['Hinweis',infoKomplett||'–'],['Rückmeldung an',daten.email]].forEach(function(p){
+        var dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=p[0];dd.textContent=p[1];dl.appendChild(dt);dl.appendChild(dd);});
+      f.hidden=true;document.getElementById('danke').hidden=false;document.getElementById('danke').querySelector('h2').focus&&document.getElementById('danke').scrollIntoView({block:'start'});
+    }
+    function fehler(){knopf.disabled=false;knopf.textContent='Urlaubsantrag absenden';zeige('Der Antrag konnte nicht gesendet werden. Bitte noch einmal versuchen oder direkt an rieger@ao-consult.de schreiben.','fehler');}
+
+    if(ZAPIER_HOOK_URL.indexOf('http')!==0){ // Entwurfsmodus: nichts verschicken
+      console.info('Entwurf, nichts gesendet. Daten:',daten);setTimeout(fertig,400);return;
+    }
+    var fd=new FormData();Object.keys(daten).forEach(function(k){fd.append(k,daten[k]);});
+    fetch(ZAPIER_HOOK_URL,{method:'POST',body:fd,mode:'no-cors'})
+      .then(function(){fertig();})
+      .catch(fehler);
+  });
+})();
+</script>
+</body>
+</html>

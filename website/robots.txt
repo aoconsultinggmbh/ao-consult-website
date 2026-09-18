@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /urlaub/
+
+Sitemap: https://ao-consult.de/sitemap.xml
