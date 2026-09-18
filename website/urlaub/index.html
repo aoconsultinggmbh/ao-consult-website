@@ -109,7 +109,7 @@ body>footer{border-top:1px solid var(--linie);background:var(--weiss)}
 <main id="inhalt">
   <section class="karte" aria-labelledby="titel">
     <h1 id="titel">Urlaub beantragen</h1>
-    <p class="lead">Fülle die Felder aus, die Urlaubstage werden automatisch gezählt. Wochenenden und Feiertage in Baden-Württemberg sind schon herausgerechnet.</p>
+    <p class="lead">Fülle die Felder aus, die Urlaubstage werden automatisch gezählt. Wochenenden und Feiertage in Baden-Württemberg sind schon herausgerechnet, Heiligabend und Silvester zählen als halbe Tage.</p>
 
     <form id="antrag" novalidate>
       <fieldset>
@@ -255,16 +255,18 @@ body>footer{border-top:1px solid var(--linie);background:var(--weiss)}
 
   // Zaehlt Arbeitstage zwischen von und bis (beide inklusive).
   function zaehle(vonISO,bisISO){
-    var von=parseISO(vonISO),bis=parseISO(bisISO),tage=0,wochenende=0,feier=[];
+    var von=parseISO(vonISO),bis=parseISO(bisISO),tage=0,wochenende=0,feier=[],halbe=[];
     var ft={};[von.getUTCFullYear(),bis.getUTCFullYear()].forEach(function(j){Object.assign(ft,feiertageBW(j));});
     for(var d=von;d<=bis;d=plus(d,1)){
       var wt=d.getUTCDay();
       if(wt===0||wt===6){wochenende++;continue;}
       var k=key(d);
       if(ft[k]){feier.push(ft[k]+' ('+deutsch(d)+')');continue;}
+      // 24.12. und 31.12. sind bei AO halbe Arbeitstage
+      if(d.getUTCMonth()===11&&(d.getUTCDate()===24||d.getUTCDate()===31)){tage+=0.5;halbe.push((d.getUTCDate()===24?'Heiligabend':'Silvester')+' ('+deutsch(d)+'), zählt als halber Tag');continue;}
       tage++;
     }
-    return {tage:tage,wochenende:wochenende,feiertage:feier};
+    return {tage:tage,wochenende:wochenende,feiertage:feier,halbe:halbe};
   }
 
   // === Formular ===========================================================
@@ -286,18 +288,21 @@ body>footer{border-top:1px solid var(--linie);background:var(--weiss)}
     if(!von.value||!bis.value){anzeige.textContent='–';detail.textContent='Bitte Zeitraum wählen.';halbBlock.hidden=true;aktuell={tage:0,text:'0'};return;}
     if(bis.value<von.value){bis.value=von.value;}
     var einTag=von.value===bis.value;
-    halbBlock.hidden=!einTag;
-    if(!einTag){f.querySelector('input[name=halber_tag][value=""]').checked=true;}
     var e=zaehle(von.value,bis.value),t=e.tage;
+    // Halber Tag nur waehlbar, wenn genau ein Tag gewaehlt ist und der nicht ohnehin halb zaehlt
+    halbBlock.hidden=!einTag||e.halbe.length>0;
+    if(halbBlock.hidden){f.querySelector('input[name=halber_tag][value=""]').checked=true;}
     if(einTag&&halberTagWert()&&t===1){t=0.5;}
     aktuell={tage:t,text:String(t).replace('.',',')};
     anzeige.textContent=aktuell.text;
     var teile=[];
     if(e.wochenende)teile.push(e.wochenende+' Wochenendtag'+(e.wochenende>1?'e':''));
     if(e.feiertage.length)teile.push(e.feiertage.length+' Feiertag'+(e.feiertage.length>1?'e':''));
+    if(e.halbe.length)teile.push(e.halbe.length>1?e.halbe.length+' halbe Tage':'1 halber Tag');
     if(t===0){detail.textContent='In diesem Zeitraum liegt kein Arbeitstag.';}
-    else{detail.textContent=teile.length?'Nicht gezählt: '+teile.join(' und ')+'.':'Alle Tage im Zeitraum sind Arbeitstage.';}
-    if(e.feiertage.length){ftListe.hidden=false;e.feiertage.forEach(function(x){var li=document.createElement('li');li.textContent=x;ftListe.appendChild(li);});}
+    else{detail.textContent=teile.length?'Nicht voll gezählt: '+teile.join(', ')+'.':'Alle Tage im Zeitraum sind Arbeitstage.';}
+    var liste=e.feiertage.concat(e.halbe);
+    if(liste.length){ftListe.hidden=false;liste.forEach(function(x){var li=document.createElement('li');li.textContent=x;ftListe.appendChild(li);});}
   }
   von.addEventListener('change',function(){if(!bis.value||bis.value<von.value)bis.value=von.value;rechne();});
   bis.addEventListener('change',rechne);
