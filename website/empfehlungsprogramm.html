@@ -275,7 +275,9 @@ window.AO_EINWILLIGUNG = {
       <p class="sepa__hinweis"><svg aria-hidden="true"><use href="#ic-schild"/></svg><span>Ihre Angaben gehen an unser Team in Bruchsal und werden nicht weitergegeben. Fragen dazu beantwortet <a href="mailto:service@ao-consult.de">service@ao-consult.de</a>.</span></p>
     </div>
 
-    <form class="formular reveal" id="empfehlung-formular" data-pruefen novalidate aria-labelledby="ef-formular-titel">
+    <form class="formular reveal" id="empfehlung-formular" data-pruefen novalidate aria-labelledby="ef-formular-titel" action="formular.php" method="post">
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden"><label for="e-fax">Fax</label><input id="e-fax" name="firmenfax" type="text" tabindex="-1" autocomplete="off"></div>
+      <input type="hidden" name="formular" value="empfehlung">
       <h3 id="ef-formular-titel">Empfehlungsformular</h3>
       <p class="formular__hinweis">Alle mit <span aria-hidden="true">*</span> gekennzeichneten Felder sind Pflichtfelder.</p>
       <div class="feld">
@@ -329,7 +331,7 @@ window.AO_EINWILLIGUNG = {
         <p class="fehler" id="e-ok-fehler" hidden>Ohne Ihre Einwilligung dürfen wir die Angaben nicht verarbeiten.</p>
       </div>
       <button class="knopf knopf--primaer knopf--gross knopf--breit" type="submit">Empfehlung abgeben</button>
-      <p class="formular__klein">Im Entwurf wird nichts versendet und nichts gespeichert.</p>
+      <p class="formular__klein">Ihre Angaben gehen verschlüsselt an unser Team und werden nur zur Bearbeitung Ihrer Anfrage verwendet.</p>
       <div class="danke" hidden role="status">
         <h3>Danke, Ihre Empfehlung ist bei uns.</h3>
         <p>Wir melden uns bei der empfohlenen Person und halten Sie auf dem Laufenden.</p>
@@ -444,5 +446,6 @@ window.AO_EINWILLIGUNG = {
 <script src="assets/js/einwilligung.js" defer></script>
 <script src="assets/js/barrierefreiheit.js" defer></script>
 <script src="assets/js/skript.js" defer></script>
+<script src="assets/js/versand.js" defer></script>
 </body>
 </html>

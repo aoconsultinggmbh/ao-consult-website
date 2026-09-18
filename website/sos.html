@@ -181,7 +181,9 @@ window.AO_EINWILLIGUNG = {
       </div>
     </div>
 
-    <form class="formular reveal" id="sos-formular" data-pruefen novalidate aria-labelledby="sos-formular-titel">
+    <form class="formular reveal" id="sos-formular" data-pruefen novalidate aria-labelledby="sos-formular-titel" action="formular.php" method="post" data-weiter="danke.html">
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden"><label for="o-fax">Fax</label><input id="o-fax" name="firmenfax" type="text" tabindex="-1" autocomplete="off"></div>
+      <input type="hidden" name="formular" value="sos">
       <h3 id="sos-formular-titel">Soforthilfe anfordern</h3>
       <p class="formular__hinweis">Alle mit <span aria-hidden="true">*</span> gekennzeichneten Felder sind Pflichtfelder.</p>
       <div class="feld">
@@ -241,7 +243,7 @@ window.AO_EINWILLIGUNG = {
         <p class="fehler" id="o-ds-fehler" hidden>Ohne Ihre Einwilligung dürfen wir die Anfrage nicht bearbeiten.</p>
       </div>
       <button class="knopf knopf--primaer knopf--gross knopf--breit" type="submit">Absenden</button>
-      <p class="formular__klein">Im Entwurf wird nichts versendet und nichts gespeichert.</p>
+      <p class="formular__klein">Ihre Angaben gehen verschlüsselt an unser Team und werden nur zur Bearbeitung Ihrer Anfrage verwendet.</p>
       <div class="danke" hidden role="status">
         <h3>Danke, Ihre Anfrage ist bei uns.</h3>
         <p>Wir prüfen Ihre Angaben und melden uns zu der Zeit, die Sie uns genannt haben. Wenn es vorher dringend wird, rufen Sie uns unter 0176 85933551 an.</p>
@@ -336,5 +338,6 @@ window.AO_EINWILLIGUNG = {
 <script src="assets/js/einwilligung.js" defer></script>
 <script src="assets/js/barrierefreiheit.js" defer></script>
 <script src="assets/js/skript.js" defer></script>
+<script src="assets/js/versand.js" defer></script>
 </body>
 </html>

@@ -1693,3 +1693,7 @@ section.dunkel + section.kiefer{clip-path:polygon(0 0,100% 0,100% 100%,0 calc(10
 .netz-sektion:not(.dunkel) .netz__mitte{box-shadow:0 0 0 10px rgba(43,135,218,.14),0 24px 50px -22px rgba(36,61,111,.4)}
 @keyframes netzatmen-hell{0%,100%{opacity:.7}50%{opacity:1}}
 .netz-sektion:not(.dunkel) .netz__punkt{animation-name:netzatmen-hell}
+
+/* Formularversand */
+.formular.sendet button[type=submit]{opacity:.65;pointer-events:none}
+.fehler--versand{margin-top:1rem}

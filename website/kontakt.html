@@ -201,7 +201,9 @@ window.AO_EINWILLIGUNG = {
     </div>
 
     <div class="kontakt__spalte">
-      <form class="formular reveal" id="formular" novalidate aria-labelledby="formular-titel">
+      <form class="formular reveal" id="formular" novalidate aria-labelledby="formular-titel" action="formular.php" method="post" data-weiter="danke.html">
+      <div aria-hidden="true" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden"><label for="f-fax">Fax</label><input id="f-fax" name="firmenfax" type="text" tabindex="-1" autocomplete="off"></div>
+      <input type="hidden" name="formular" value="kontakt">
       <h3 id="formular-titel">Erstgespräch anfragen</h3>
       <p class="formular__hinweis">Wir melden uns innerhalb eines Werktags, um den Termin zu bestätigen.</p>
       <div class="feld">
@@ -244,7 +246,7 @@ window.AO_EINWILLIGUNG = {
         <p class="fehler" id="f-ds-fehler" hidden>Ohne Ihre Einwilligung dürfen wir die Anfrage nicht bearbeiten.</p>
       </div>
       <button class="knopf knopf--primaer knopf--gross knopf--breit" type="submit">Anfrage senden</button>
-      <p class="formular__klein">Im Entwurf wird nichts versendet.</p>
+      <p class="formular__klein">Ihre Angaben gehen verschlüsselt an unser Team und werden nur zur Bearbeitung Ihrer Anfrage verwendet.</p>
       <div class="danke" hidden role="status">
         <h3>Danke, wir rufen Sie an.</h3>
         <p>Ihre Anfrage ist bei uns angekommen. Ein Teammitglied meldet sich innerhalb eines Werktags, um den Termin für das 15-minütige Erstgespräch zu bestätigen.</p>
@@ -364,5 +366,6 @@ window.AO_EINWILLIGUNG = {
 <script src="assets/js/einwilligung.js" defer></script>
 <script src="assets/js/barrierefreiheit.js" defer></script>
 <script src="assets/js/skript.js" defer></script>
+<script src="assets/js/versand.js" defer></script>
 </body>
 </html>

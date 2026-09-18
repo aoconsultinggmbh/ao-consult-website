@@ -337,7 +337,7 @@
 
   /* ---------- Formular: Prüfung, dann Danke-Ansicht ---------- */
   var form = document.getElementById('formular');
-  if (form) {
+  if (form && form.tagName === 'FORM') {
     var zeige = function (id, an) {
       var f = document.getElementById(id);
       if (f) f.hidden = !an;
