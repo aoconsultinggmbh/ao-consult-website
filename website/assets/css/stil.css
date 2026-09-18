@@ -743,7 +743,8 @@ body > .fuss{background:var(--fuss);color:rgba(255,255,255,.7);padding:3.5rem 0 
 .bf-knopf:hover,.bf-knopf:focus-visible{background:var(--blau-dunkel)!important}
 
 /* ---------- Sichtbarkeit: Praxis in der Mitte, Region drumherum ---------- */
-.einleitung--kurz{font-weight:600;color:#fff;margin-bottom:.5rem}
+.einleitung--kurz{font-weight:600;color:var(--kopf);margin-bottom:.5rem}
+.dunkel .einleitung--kurz{color:#fff}
 .netz-sektion{overflow:hidden}
 .netz-sektion .knopf{margin-top:2.2rem}
 .netz__raster{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,5vw,5rem);align-items:center}
@@ -1681,3 +1682,14 @@ section.dunkel + section.kiefer{clip-path:polygon(0 0,100% 0,100% 100%,0 calc(10
 .telefon__kameramodul::after{content:"";grid-column:2;grid-row:2;width:18%;aspect-ratio:1;border-radius:50%;
   background:#05070a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 .telefon__kameramodul .telefon__blitz.an{background:#fff8d8;box-shadow:0 0 18px 6px rgba(255,246,199,.85),0 0 60px 26px rgba(255,240,170,.45)}
+
+/* Startseite: Netz-Sektion hell, damit vor dem dunklen Kiefer-Block nicht zwei dunkle Bloecke aufeinander folgen */
+.netz-sektion:not(.dunkel) .netz__ring{border-color:rgba(36,61,111,.18)}
+.netz-sektion:not(.dunkel) .netz__ring--2{border-color:rgba(36,61,111,.1)}
+.netz-sektion:not(.dunkel) .netz__linien line{stroke:var(--blau);opacity:.5}
+.netz-sektion:not(.dunkel) .netz__punkt{background:#fff;border-color:rgba(43,135,218,.28);color:var(--blau);box-shadow:0 8px 20px -12px rgba(36,61,111,.35)}
+.netz-sektion:not(.dunkel) .netz__punkt:nth-of-type(2n){color:var(--blau-dunkel)}
+.netz-sektion:not(.dunkel) .netz__kanal{background:#fff;border-color:rgba(43,135,218,.35);color:var(--blau-dunkel);box-shadow:0 6px 16px -10px rgba(36,61,111,.3)}
+.netz-sektion:not(.dunkel) .netz__mitte{box-shadow:0 0 0 10px rgba(43,135,218,.14),0 24px 50px -22px rgba(36,61,111,.4)}
+@keyframes netzatmen-hell{0%,100%{opacity:.7}50%{opacity:1}}
+.netz-sektion:not(.dunkel) .netz__punkt{animation-name:netzatmen-hell}
