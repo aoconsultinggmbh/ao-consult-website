@@ -233,7 +233,7 @@
     return !!(window.aoEinwilligung && window.aoEinwilligung.erlaubt(MEDIEN));
   };
   var videoBox = document.querySelector('.video__box');
-  var ladeVideo = function () {
+  var ladeVideo = function (abspielen) {
     if (!videoBox || videoBox.dataset.geladen === '1') return;
     var id = videoBox.dataset.video;
     if (!id || id.indexOf('EINTRAGEN') !== -1) {
@@ -243,7 +243,7 @@
     }
     videoBox.dataset.geladen = '1';
     var rahmen = document.createElement('iframe');
-    rahmen.src = 'https://fast.wistia.net/embed/iframe/' + encodeURIComponent(id) + '?videoFoam=true&autoPlay=true';
+    rahmen.src = 'https://fast.wistia.net/embed/iframe/' + encodeURIComponent(id) + '?videoFoam=true' + (abspielen ? '&autoPlay=true' : '');
     rahmen.title = 'Vorstellungsvideo AO Consulting';
     rahmen.allow = 'autoplay; fullscreen';
     rahmen.setAttribute('allowfullscreen', '');
@@ -254,9 +254,16 @@
     var knopf = videoBox.querySelector('[data-video-laden]');
     if (knopf) knopf.addEventListener('click', function () {
       if (window.aoEinwilligung) window.aoEinwilligung.setze(MEDIEN, true);
-      ladeVideo();
+      ladeVideo(true); // erst der Klick startet das Video
     });
-    var pruefeMedien = function () { if (darfMedien()) ladeVideo(); };
+    // Liegt die Einwilligung schon vor, bleibt trotzdem das Vorschaubild stehen.
+    // Das Video startet nie von selbst, nur der Hinweistext entfaellt.
+    var pruefeMedien = function () {
+      if (!darfMedien() || videoBox.dataset.geladen === '1') return;
+      if (knopf) knopf.textContent = 'Video abspielen';
+      var text = videoBox.querySelector('.video__hinweis p');
+      if (text) text.hidden = true;
+    };
     document.addEventListener('ao:einwilligung', pruefeMedien);
     pruefeMedien();
   }

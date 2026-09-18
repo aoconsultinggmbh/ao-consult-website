@@ -1644,4 +1644,12 @@ html.bf-lesemaske .bf-maske{display:block}
 .schraeg,.schraeg--oben,.schraeg--unten,.kiefer{z-index:2}
 section:has(+ .schraeg),section:has(+ .schraeg--oben),section:has(+ .kiefer){margin-bottom:calc(-1 * var(--schraeg));border-bottom:var(--schraeg) solid transparent;z-index:1}
 .schraeg + section,.schraeg--unten + section,.kiefer + section{margin-top:calc(-1 * var(--schraeg));border-top:var(--schraeg) solid transparent;z-index:1}
-main:has(> .schraeg:last-child) + footer,main:has(> .schraeg--unten:last-child) + footer{margin-top:calc(-1 * var(--schraeg));border-top:var(--schraeg) solid transparent;position:relative;z-index:1}
+/* Letzte dunkle Sektion vor der Fusszeile: gerade Unterkante und gleiche Farbe wie die
+   Fusszeile, damit beides eine Flaeche wird statt Grau auf Schwarz. */
+main > .schraeg:last-child{clip-path:polygon(0 var(--schraeg),100% 0,100% 100%,0 100%);padding-bottom:clamp(4.5rem,8.5vw,7.5rem)}
+main > .schraeg--unten:last-child{clip-path:none}
+main > .dunkel:last-child{background:linear-gradient(160deg,var(--tinte-2) 0,var(--tinte) 55%,var(--fuss) 100%)}
+
+/* Zwei dunkle Schraegen hintereinander (Netz -> Kiefer): die obere bekommt unten eine
+   gerade Kante, sonst kreuzen sich die Schnitte und ein weisser Keil entsteht. */
+.schraeg:has(+ .kiefer){clip-path:polygon(0 var(--schraeg),100% 0,100% 100%,0 100%)}
