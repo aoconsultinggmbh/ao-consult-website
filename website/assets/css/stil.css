@@ -1637,3 +1637,11 @@ html.bf-lesemaske .bf-maske{display:block}
   .bf-panel{transition:none}
   .bf-knopf{transition:none}
 }
+
+/* Schraege Kanten: die Nachbarsektion laeuft hinter die Schraege, damit der
+   Freischnitt ihre Farbe traegt statt Weiss. Transparenter Rand + negativer
+   Abstand: der Hintergrund fuellt den Rand, der Inhalt bleibt, wo er war. */
+.schraeg,.schraeg--oben,.schraeg--unten,.kiefer{z-index:2}
+section:has(+ .schraeg),section:has(+ .schraeg--oben),section:has(+ .kiefer){margin-bottom:calc(-1 * var(--schraeg));border-bottom:var(--schraeg) solid transparent;z-index:1}
+.schraeg + section,.schraeg--unten + section,.kiefer + section{margin-top:calc(-1 * var(--schraeg));border-top:var(--schraeg) solid transparent;z-index:1}
+main:has(> .schraeg:last-child) + footer,main:has(> .schraeg--unten:last-child) + footer{margin-top:calc(-1 * var(--schraeg));border-top:var(--schraeg) solid transparent;position:relative;z-index:1}
