@@ -3,3 +3,4 @@ Allow: /
 Disallow: /urlaub/
 
 Sitemap: https://ao-consult.de/sitemap.xml
+Disallow: /willkommen/

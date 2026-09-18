@@ -42,6 +42,23 @@ Das ist der **interne Urlaubsantrag**, kein Teil der öffentlichen Seite.
   (Zap „Urlaubsantrag Webseite -> Asana“, Schritt 1, „Your webhook URL“). Ovidiu hat sie.
 - Fehlt das Secret, laesst der Livegang-Ablauf den Ordner `urlaub/` bewusst weg.
 
+## Der Ordner `website/willkommen/` — Kunden-Willkommensseite
+
+Die Seite fuer neue Kunden mit den naechsten Schritten und dem SEPA-Lastschriftformular.
+Oeffentlich erreichbar, aber nur ueber den Link: `noindex`, in `robots.txt` gesperrt,
+nicht in der Sitemap, nicht im Menue. Der Link wird den Kunden von uns geschickt.
+
+- `index.html` nutzt CSS und Skripte der Hauptseite (`../assets/...`).
+- `sepa.php` nimmt das Mandat entgegen und mailt es an **buchhaltung@ao-consult.de**,
+  Absender **service@ao-consult.de**. Prueft IBAN (Pruefziffer), Pflichtfelder, Honigtopf.
+  Speichert nichts auf dem Server. Empfaenger und Absender stehen oben in der Datei.
+- In der Vorschau (GitHub Pages) laeuft kein PHP: das Formular zeigt dann einen Hinweis,
+  dass nichts verschickt wird. Der Versand funktioniert erst beim Hoster.
+- **Vor dem Livegang pruefen:** Darf der All-Inkl-Server im Namen von service@ao-consult.de
+  senden? Der SPF-Eintrag der Domain ao-consult.de muss den Mailserver des Hosters
+  erlauben (bei All-Inkl `include:_spf.kasserver.com`), sonst landen die Mandate im Spam
+  oder werden abgewiesen. Erster Testversand nach dem Livegang an die Buchhaltung.
+
 ## Regeln
 
 - Keine Schriften, Skripte oder Karten von fremden Servern ohne Freigabe.
@@ -60,6 +77,7 @@ Das ist der **interne Urlaubsantrag**, kein Teil der öffentlichen Seite.
 - [ ] **Impressum, Datenschutz und AGB** gegenlesen lassen.
 - [ ] **3D-Kiefermodell:** Die GLB-Datei fehlt, das Skript erwartet sie. Bei Ovi nachfragen.
 - [ ] **Urlaubsantrag:** Secret setzen, Verzeichnisschutz im KAS anlegen.
+- [ ] **Willkommensseite:** SPF pruefen, Testmandat an buchhaltung@ schicken.
 - [ ] **Umzug planen:** alte Adressen von `ao-consult.de` weiterleiten, damit keine
       Google-Platzierung verloren geht.
 - [ ] **Messung** nach demselben Muster wie bei den Kundenprojekten
