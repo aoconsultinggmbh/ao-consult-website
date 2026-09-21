@@ -76,16 +76,51 @@ jobs:
             rm -rf website/urlaub
           fi
 
-      - name: Auf den Server hochladen (FTPS)
+      - name: Upload-Werkzeug installieren (lftp)
         if: steps.pruefen.outputs.bereit == 'ja'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_BENUTZER }}
-          password: ${{ secrets.FTP_PASSWORT }}
-          protocol: ftps
-          local-dir: ./website/
-          server-dir: ${{ secrets.FTP_ORDNER }}
-          exclude: |
-            **/.DS_Store
-            **/_alte-dateinamen/**
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      # Hochladen mit lftp statt mit einem fertigen GitHub-Baustein.
+      #
+      # Grund (erprobt beim Livegang Kiefer am 21.09.2026):
+      # Der Baustein SamKirkland/FTP-Deploy-Action bricht bei All-Inkl mit
+      # "Client is closed because read ECONNRESET (data socket)" ab. lftp kommt
+      # mit deren FTPS zurecht, weil es die TLS-Sitzung der Steuerverbindung
+      # auf der Datenverbindung wiederverwendet - genau das verlangt der Server.
+      #
+      # Wichtige Einstellungen und warum:
+      #   ssl-force / ssl-protect-data  Anmeldung UND Dateien verschluesselt
+      #   passive-mode true             der Runner steht hinter einer Firewall
+      #   prefer-epsv false             All-Inkl antwortet auf EPSV unzuverlaessig
+      #   cmd:fail-exit true            ein Fehler laesst den Ablauf rot werden,
+      #                                 statt faelschlich "erfolgreich" zu melden
+      #   open + user (zwei Zeilen)     vertraegt Passwoerter mit Komma oder @,
+      #                                 anders als "open -u benutzer,passwort"
+      #
+      # --delete raeumt Dateien weg, die es im Projekt nicht mehr gibt.
+      # Das ist gewollt: im Zielordner liegt ausschliesslich diese Webseite.
+      - name: Auf den Server hochladen (FTPS, verschluesselt)
+        if: steps.pruefen.outputs.bereit == 'ja'
+        env:
+          SERVER: ${{ secrets.FTP_SERVER }}
+          BENUTZER: ${{ secrets.FTP_BENUTZER }}
+          PASSWORT: ${{ secrets.FTP_PASSWORT }}
+          ORDNER: ${{ secrets.FTP_ORDNER }}
+        run: |
+          lftp <<LFTP
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate true
+          set ftp:passive-mode true
+          set ftp:prefer-epsv false
+          set net:max-retries 3
+          set net:timeout 25
+          set net:reconnect-interval-base 5
+          set xfer:clobber on
+          set cmd:fail-exit true
+          open "$SERVER"
+          user "$BENUTZER" "$PASSWORT"
+          mirror --reverse --delete --verbose=1 --parallel=2 --exclude-glob .DS_Store --exclude-glob _alte-dateinamen/ ./website/ "${ORDNER:-./}"
+          bye
+          LFTP
+          echo "Upload abgeschlossen."
