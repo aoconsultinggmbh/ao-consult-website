@@ -22,7 +22,7 @@ function ao_bestaetigung_senden($an, $art, $absender) {
                 'So geht es weiter: Innerhalb eines Werktags meldet sich jemand aus unserem Team in Bruchsal bei Ihnen und stimmt einen Termin für das kostenfreie Erstgespräch ab. Das Gespräch dauert etwa 15 Minuten und findet telefonisch statt.',
                 'Wenn Sie noch etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail.',
             ],
-            'knopf'   => ['Was Sie im Erstgespräch erwartet', 'https://ao-consult.de/ihr-erstgespraech.html'],
+            'knopf'   => ['Was Sie im Erstgespräch erwartet', 'https://ao-consult.de/ihr-erstgespraech/'],
         ],
         'sos' => [
             'betreff' => 'Ihre SOS-Anfrage bei AO Consulting ist angekommen',
@@ -32,7 +32,7 @@ function ao_bestaetigung_senden($an, $art, $absender) {
                 'So geht es weiter: Wir sehen uns Ihre Angaben an und melden uns innerhalb eines Werktags bei Ihnen.',
                 'Wenn Sie noch etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail.',
             ],
-            'knopf'   => ['Unsere Fallstudien ansehen', 'https://ao-consult.de/fallstudien.html'],
+            'knopf'   => ['Unsere Fallstudien ansehen', 'https://ao-consult.de/fallstudien/'],
         ],
         'empfehlung' => [
             'betreff' => 'Danke für Ihre Empfehlung an AO Consulting',
@@ -42,7 +42,7 @@ function ao_bestaetigung_senden($an, $art, $absender) {
                 'So geht es weiter: Wir nehmen Kontakt mit Ihrer Empfehlung auf und melden uns bei Ihnen, sobald es Neuigkeiten gibt.',
                 'Wenn Sie noch etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail.',
             ],
-            'knopf'   => ['Zum Empfehlungsprogramm', 'https://ao-consult.de/empfehlungsprogramm.html'],
+            'knopf'   => ['Zum Empfehlungsprogramm', 'https://ao-consult.de/empfehlungsprogramm/'],
         ],
     ];
     if (!isset($T[$art])) return false;
@@ -100,8 +100,8 @@ function ao_bestaetigung_senden($an, $art, $absender) {
       . '<tr><td bgcolor="' . $fuss . '" style="background:' . $fuss . ';padding:24px 40px;font-family:' . $schrift2 . ';font-size:13px;line-height:1.6;color:#a9adb8;">'
       . '<strong style="color:#ffffff;">AO Consulting GmbH</strong><br>Zeiloch 13 · 76646 Bruchsal<br>'
       . '<a href="https://ao-consult.de" style="color:#8ec3f2;text-decoration:none;">ao-consult.de</a>'
-      . ' · <a href="https://ao-consult.de/impressum.html" style="color:#8ec3f2;text-decoration:none;">Impressum</a>'
-      . ' · <a href="https://ao-consult.de/datenschutz.html" style="color:#8ec3f2;text-decoration:none;">Datenschutz</a>'
+      . ' · <a href="https://ao-consult.de/impressum/" style="color:#8ec3f2;text-decoration:none;">Impressum</a>'
+      . ' · <a href="https://ao-consult.de/datenschutzerklaerung/" style="color:#8ec3f2;text-decoration:none;">Datenschutz</a>'
       . '</td></tr>'
       . '</table>'
       . '<p style="max-width:600px;margin:16px auto 0;font-family:' . $schrift2 . ';font-size:12px;line-height:1.5;color:#6e7a8c;">'

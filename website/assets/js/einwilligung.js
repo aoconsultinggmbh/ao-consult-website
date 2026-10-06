@@ -35,8 +35,8 @@
   // wirklich nutzt. Eine leere Kategorie aufzulisten wäre irreführend.
   // ------------------------------------------------------------------------
   var VORGABE = {
-    datenschutz: 'datenschutz.html',
-    impressum: 'impressum.html',
+    datenschutz: '/datenschutzerklaerung/',
+    impressum: '/impressum/',
     kategorien: [
       {
         id: 'notwendig',

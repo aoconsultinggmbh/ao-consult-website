@@ -27,30 +27,29 @@ RewriteRule ^ - [L]
 # RewriteCond %{HTTP_HOST} ^www\. [NC]
 # RewriteRule ^(.*)$ https://ao-consult.de/$1 [R=301,L]
 
-# --- Alte Adressen der WordPress-Seite dauerhaft umleiten ------------------
-# Damit Google-Platzierungen, Lesezeichen und Links in alten Mails weiter
-# funktionieren. Relative Ziele, damit das auch auf der Testadresse klappt.
-RedirectMatch 301 ^/kontakt/?$ /kontakt.html
-RedirectMatch 301 ^/fallstudien/?$ /fallstudien.html
-RedirectMatch 301 ^/fallstudien/zahnarztpraxis-dr-sandro-stroessner/?$ /fallstudie-zahnarztpraxis-stroessner.html
-RedirectMatch 301 ^/fallstudien/kimmel-zahntechnik-gmbh/?$ /fallstudie-kimmel-zahntechnik.html
-RedirectMatch 301 ^/fallstudien/zahnarztpraxis-kindler-und-kollegen/?$ /fallstudie-zahnarztpraxis-kindler.html
-RedirectMatch 301 ^/fallstudien/teamziereis-gmbh/?$ /fallstudie-teamziereis.html
-RedirectMatch 301 ^/fidelius-mvz/?$ /fallstudie-fidelius-mvz.html
-RedirectMatch 301 ^/optident-mvz/?$ /fallstudie-optident-mvz.html
-RedirectMatch 301 ^/ihr-erstgespraech/?$ /ihr-erstgespraech.html
-RedirectMatch 301 ^/ihr-beratungsgespraech/?$ /ihr-beratungsgespraech.html
-RedirectMatch 301 ^/sos/?$ /sos.html
-RedirectMatch 301 ^/empfehlungsprogramm/?$ /empfehlungsprogramm.html
-RedirectMatch 301 ^/partner/?$ /partner.html
-RedirectMatch 301 ^/(team|ueber-uns)/?$ /ueber-uns.html
-RedirectMatch 301 ^/impressum/?$ /impressum.html
-RedirectMatch 301 ^/(datenschutz|datenschutzerklaerung)/?$ /datenschutz.html
-RedirectMatch 301 ^/agb/?$ /agb.html
-RedirectMatch 301 ^/hinweis-zur-gleichstellung/?$ /gleichstellung.html
-RedirectMatch 301 ^/danke/?$ /danke.html
+# --- Adressen -------------------------------------------------------------
+# Die Seiten liegen unter denselben Adressen wie auf der alten WordPress-Seite
+# (z. B. /kontakt/, /fallstudien/kimmel-zahntechnik-gmbh/), jeweils als Ordner
+# mit index.html. Alte Links funktionieren dadurch ohne Umweg.
+# Nur diese alten Adressen gibt es nicht mehr und werden umgeleitet.
+# Relative Ziele, damit das auch auf der Testadresse klappt.
+RedirectMatch 301 ^/team/?$ /ueber-uns/
+RedirectMatch 301 ^/datenschutz/?$ /datenschutzerklaerung/
 RedirectMatch 301 ^/herzlich-willkommen/?$ /willkommen/
 RedirectMatch 301 ^/onboarding/?$ /
+# Fruehere .html-Adressen aus der Vorschau-Zeit
+RedirectMatch 301 ^/index\.html$ /
+RedirectMatch 301 ^/kontakt\.html$ /kontakt/
+RedirectMatch 301 ^/fallstudien\.html$ /fallstudien/
+RedirectMatch 301 ^/fallstudie-zahnarztpraxis-stroessner\.html$ /fallstudien/zahnarztpraxis-dr-sandro-stroessner/
+RedirectMatch 301 ^/fallstudie-kimmel-zahntechnik\.html$ /fallstudien/kimmel-zahntechnik-gmbh/
+RedirectMatch 301 ^/fallstudie-zahnarztpraxis-kindler\.html$ /fallstudien/zahnarztpraxis-kindler-und-kollegen/
+RedirectMatch 301 ^/fallstudie-teamziereis\.html$ /fallstudien/teamziereis-gmbh/
+RedirectMatch 301 ^/fallstudie-fidelius-mvz\.html$ /fidelius-mvz/
+RedirectMatch 301 ^/fallstudie-optident-mvz\.html$ /optident-mvz/
+RedirectMatch 301 ^/(ihr-erstgespraech|ihr-beratungsgespraech|sos|empfehlungsprogramm|partner|ueber-uns|impressum|agb|danke)\.html$ /$1/
+RedirectMatch 301 ^/datenschutz\.html$ /datenschutzerklaerung/
+RedirectMatch 301 ^/gleichstellung\.html$ /hinweis-zur-gleichstellung/
 
 ErrorDocument 404 /index.html
 

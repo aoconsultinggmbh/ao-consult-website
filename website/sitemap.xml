@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://ao-consult.de/agb.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/datenschutz.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/empfehlungsprogramm.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudie-fidelius-mvz.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudie-kimmel-zahntechnik.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudie-optident-mvz.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudie-teamziereis.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudie-zahnarztpraxis-kindler.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudie-zahnarztpraxis-stroessner.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/fallstudien.html</loc><lastmod>2026-09-18</lastmod><priority>0.8</priority></url>
-  <url><loc>https://ao-consult.de/gleichstellung.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/impressum.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/agb/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/datenschutzerklaerung/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/empfehlungsprogramm/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/fidelius-mvz/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/fallstudien/kimmel-zahntechnik-gmbh/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/optident-mvz/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/fallstudien/teamziereis-gmbh/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/fallstudien/zahnarztpraxis-kindler-und-kollegen/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/fallstudien/zahnarztpraxis-dr-sandro-stroessner/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/fallstudien/</loc><lastmod>2026-09-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://ao-consult.de/hinweis-zur-gleichstellung/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/impressum/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
   <url><loc>https://ao-consult.de/</loc><lastmod>2026-09-18</lastmod><priority>1.0</priority></url>
-  <url><loc>https://ao-consult.de/kontakt.html</loc><lastmod>2026-09-18</lastmod><priority>0.9</priority></url>
-  <url><loc>https://ao-consult.de/partner.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/sos.html</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
-  <url><loc>https://ao-consult.de/ueber-uns.html</loc><lastmod>2026-09-18</lastmod><priority>0.8</priority></url>
+  <url><loc>https://ao-consult.de/kontakt/</loc><lastmod>2026-09-18</lastmod><priority>0.9</priority></url>
+  <url><loc>https://ao-consult.de/partner/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/sos/</loc><lastmod>2026-09-18</lastmod><priority>0.6</priority></url>
+  <url><loc>https://ao-consult.de/ueber-uns/</loc><lastmod>2026-09-18</lastmod><priority>0.8</priority></url>
 </urlset>
