@@ -1,7 +1,8 @@
 <?php
 /*
  * Nimmt die Formulare der Webseite entgegen (Kontakt, SOS, Empfehlung) und mailt
- * sie an das Team. Laeuft nur auf dem echten Server (PHP), nicht in der
+ * sie an das Team. Wer eine E-Mail-Adresse angibt, bekommt eine kurze
+ * Eingangsbestaetigung (ohne Formularinhalte). Laeuft nur auf dem echten Server (PHP), nicht in der
  * GitHub-Vorschau. Speichert nichts auf dem Server.
  *
  * Welches Formular geschickt wurde, steht im versteckten Feld "formular".
@@ -91,4 +92,49 @@ $kopf  = "From: $absName <$ABSENDER>\r\n"
 // -f setzt den technischen Absender (Envelope), wichtig fuer SPF beim Hoster
 $ok = @mail($EMPFAENGER, $betreff, $text, $kopf, '-f ' . $ABSENDER);
 if (!$ok) { http_response_code(500); antwort(false, 'Versand fehlgeschlagen.'); }
+
+// ---------------------------------------------------------------------------
+// Eingangsbestaetigung an den Absender (Wunsch Admir, 06.10.2026).
+// Bewusst OHNE Inhalte aus dem Formular: So kann niemand das Formular nutzen,
+// um fremden Leuten eigene Texte in den Posteingang zu schicken.
+// Geht nur raus, wenn eine gueltige E-Mail-Adresse angegeben wurde.
+// Scheitert sie, bleibt die Anfrage trotzdem angekommen (kein Fehler fuer den Besucher).
+// ---------------------------------------------------------------------------
+$BESTAETIGUNG = [
+    'kontakt' => [
+        'betreff' => 'Ihre Anfrage bei AO Consulting ist angekommen',
+        'text'    => "vielen Dank für Ihre Anfrage über unsere Webseite. Sie ist bei uns angekommen.\n\n"
+                   . "So geht es weiter: Innerhalb eines Werktags meldet sich jemand aus unserem Team in Bruchsal bei Ihnen und stimmt einen Termin für das kostenfreie Erstgespräch ab. Das Gespräch dauert etwa 15 Minuten und findet telefonisch statt.\n\n"
+                   . "Wenn Sie noch etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail.",
+    ],
+    'sos' => [
+        'betreff' => 'Ihre SOS-Anfrage bei AO Consulting ist angekommen',
+        'text'    => "vielen Dank für Ihre SOS-Anfrage. Sie ist bei uns angekommen.\n\n"
+                   . "So geht es weiter: Wir sehen uns Ihre Angaben an und melden uns innerhalb eines Werktags bei Ihnen.\n\n"
+                   . "Wenn Sie noch etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail.",
+    ],
+    'empfehlung' => [
+        'betreff' => 'Danke für Ihre Empfehlung an AO Consulting',
+        'text'    => "vielen Dank für Ihre Empfehlung. Sie ist bei uns angekommen.\n\n"
+                   . "So geht es weiter: Wir nehmen Kontakt mit Ihrer Empfehlung auf und melden uns bei Ihnen, sobald es Neuigkeiten gibt.\n\n"
+                   . "Wenn Sie noch etwas ergänzen möchten, antworten Sie einfach auf diese E-Mail.",
+    ],
+];
+if ($emailOk && isset($BESTAETIGUNG[$art])) {
+    $b = $BESTAETIGUNG[$art];
+    $btext = "Guten Tag,\n\n" . $b['text'] . "\n\n"
+           . "Ist es eilig? Montag bis Freitag erreichen Sie uns unter 0176 85933551.\n\n"
+           . "Viele Grüße\nIhr Team von AO Consulting\n\n"
+           . "--\nAO Consulting GmbH · Zeiloch 13 · 76646 Bruchsal\nhttps://ao-consult.de\n\n"
+           . "Sie erhalten diese E-Mail, weil über ao-consult.de ein Formular mit dieser Adresse abgeschickt wurde. "
+           . "Falls das nicht von Ihnen kam, können Sie die E-Mail einfach ignorieren.\n";
+    $bkopf = "From: =?UTF-8?B?" . base64_encode('AO Consulting') . "?= <$ABSENDER>\r\n"
+           . "Reply-To: $ABSENDER\r\n"
+           . "MIME-Version: 1.0\r\n"
+           . "Content-Type: text/plain; charset=UTF-8\r\n"
+           . "Content-Transfer-Encoding: 8bit\r\n"
+           . "Auto-Submitted: auto-replied\r\n"
+           . "X-Mailer: ao-consult.de/$art-bestaetigung\r\n";
+    @mail($email, '=?UTF-8?B?' . base64_encode($b['betreff']) . '?=', $btext, $bkopf, '-f ' . $ABSENDER);
+}
 antwort(true);
