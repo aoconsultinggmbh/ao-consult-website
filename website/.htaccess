@@ -20,6 +20,12 @@ RewriteEngine On
 RewriteCond %{HTTP_HOST} \.kasserver\.com$ [NC]
 RewriteRule ^ - [L]
 
+# /index.html nur bei direktem Aufruf auf / umleiten. Nicht per RedirectMatch:
+# Apache ruft fuer "/" intern index.html auf, das gaebe eine Endlosschleife
+# (gemessen auf All-Inkl, 06.10.2026).
+RewriteCond %{THE_REQUEST} \s/index\.html[\s?]
+RewriteRule ^index\.html$ / [R=301,L]
+
 # --- Immer https und immer ohne www (erst am Livegang-Tag freischalten) -----
 # ao-consult.de lief schon immer ohne www, Google kennt die Seite so.
 # Freischalten erst, wenn das Zertifikat fuer ao-consult.de UND www aktiv ist.
@@ -38,7 +44,6 @@ RedirectMatch 301 ^/datenschutz/?$ /datenschutzerklaerung/
 RedirectMatch 301 ^/herzlich-willkommen/?$ /willkommen/
 RedirectMatch 301 ^/onboarding/?$ /
 # Fruehere .html-Adressen aus der Vorschau-Zeit
-RedirectMatch 301 ^/index\.html$ /
 RedirectMatch 301 ^/kontakt\.html$ /kontakt/
 RedirectMatch 301 ^/fallstudien\.html$ /fallstudien/
 RedirectMatch 301 ^/fallstudie-zahnarztpraxis-stroessner\.html$ /fallstudien/zahnarztpraxis-dr-sandro-stroessner/
