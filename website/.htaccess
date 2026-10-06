@@ -76,7 +76,9 @@ ErrorDocument 404 /index.html
   AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
 </IfModule>
 
-Options -Indexes
+# MultiViews aus: sonst beantwortet Apache /kontakt/ mit kontakt.html und die
+# Umleitungen der alten Adressen greifen nicht (gemessen auf All-Inkl, 06.10.2026)
+Options -Indexes -MultiViews
 
 <IfModule mod_headers.c>
   # HTML nie zwischenspeichern: sonst sehen Besucher (und wir beim
