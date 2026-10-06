@@ -29,9 +29,10 @@ RewriteRule ^index\.html$ / [R=301,L]
 # --- Immer https und immer ohne www (erst am Livegang-Tag freischalten) -----
 # ao-consult.de lief schon immer ohne www, Google kennt die Seite so.
 # Freischalten erst, wenn das Zertifikat fuer ao-consult.de UND www aktiv ist.
-# RewriteCond %{HTTPS} !=on [OR]
-# RewriteCond %{HTTP_HOST} ^www\. [NC]
-# RewriteRule ^(.*)$ https://ao-consult.de/$1 [R=301,L]
+# Freigeschaltet am 06.10.2026 nach Let's Encrypt fuer ao-consult.de und www.
+RewriteCond %{HTTPS} !=on [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://ao-consult.de/$1 [R=301,L]
 
 # --- Adressen -------------------------------------------------------------
 # Die Seiten liegen unter denselben Adressen wie auf der alten WordPress-Seite
