@@ -20,6 +20,11 @@
 #   FTP_ORDNER     Zielordner auf dem Server, z. B.  /www.ao-consult.de/   oder  /public_html/
 #
 # Solange die Secrets fehlen, macht dieser Ablauf nichts und meldet das nur.
+#
+# Achtung (gemessen 06.10.2026): Wird der Zweig "live" NEU angelegt, startet
+# dieser Ablauf nicht, weil GitHub beim ersten Anlegen keine geaenderten
+# Dateien sieht. Dann einmal "Run workflow" auf live klicken oder eine echte
+# Aenderung nachschieben. Danach laeuft jeder Push auf live automatisch.
 # Anleitung in leichter Sprache: doku/livegang-anleitung.md
 # ---------------------------------------------------------------------------
 name: Livegang (Upload zum Hoster)
