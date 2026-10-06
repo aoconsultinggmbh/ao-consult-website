@@ -20,10 +20,37 @@ RewriteEngine On
 RewriteCond %{HTTP_HOST} \.kasserver\.com$ [NC]
 RewriteRule ^ - [L]
 
-# --- Immer https und immer www (erst am Livegang-Tag freischalten) ---------
+# --- Immer https und immer ohne www (erst am Livegang-Tag freischalten) -----
+# ao-consult.de lief schon immer ohne www, Google kennt die Seite so.
+# Freischalten erst, wenn das Zertifikat fuer ao-consult.de UND www aktiv ist.
 # RewriteCond %{HTTPS} !=on [OR]
-# RewriteCond %{HTTP_HOST} !^www\. [NC]
-# RewriteRule ^(.*)$ https://www.ao-consult.de/$1 [R=301,L]
+# RewriteCond %{HTTP_HOST} ^www\. [NC]
+# RewriteRule ^(.*)$ https://ao-consult.de/$1 [R=301,L]
+
+# --- Alte Adressen der WordPress-Seite dauerhaft umleiten ------------------
+# Damit Google-Platzierungen, Lesezeichen und Links in alten Mails weiter
+# funktionieren. Relative Ziele, damit das auch auf der Testadresse klappt.
+RedirectMatch 301 ^/kontakt/?$ /kontakt.html
+RedirectMatch 301 ^/fallstudien/?$ /fallstudien.html
+RedirectMatch 301 ^/fallstudien/zahnarztpraxis-dr-sandro-stroessner/?$ /fallstudie-zahnarztpraxis-stroessner.html
+RedirectMatch 301 ^/fallstudien/kimmel-zahntechnik-gmbh/?$ /fallstudie-kimmel-zahntechnik.html
+RedirectMatch 301 ^/fallstudien/zahnarztpraxis-kindler-und-kollegen/?$ /fallstudie-zahnarztpraxis-kindler.html
+RedirectMatch 301 ^/fallstudien/teamziereis-gmbh/?$ /fallstudie-teamziereis.html
+RedirectMatch 301 ^/fidelius-mvz/?$ /fallstudie-fidelius-mvz.html
+RedirectMatch 301 ^/optident-mvz/?$ /fallstudie-optident-mvz.html
+RedirectMatch 301 ^/ihr-erstgespraech/?$ /ihr-erstgespraech.html
+RedirectMatch 301 ^/ihr-beratungsgespraech/?$ /ihr-beratungsgespraech.html
+RedirectMatch 301 ^/sos/?$ /sos.html
+RedirectMatch 301 ^/empfehlungsprogramm/?$ /empfehlungsprogramm.html
+RedirectMatch 301 ^/partner/?$ /partner.html
+RedirectMatch 301 ^/(team|ueber-uns)/?$ /ueber-uns.html
+RedirectMatch 301 ^/impressum/?$ /impressum.html
+RedirectMatch 301 ^/(datenschutz|datenschutzerklaerung)/?$ /datenschutz.html
+RedirectMatch 301 ^/agb/?$ /agb.html
+RedirectMatch 301 ^/hinweis-zur-gleichstellung/?$ /gleichstellung.html
+RedirectMatch 301 ^/danke/?$ /danke.html
+RedirectMatch 301 ^/herzlich-willkommen/?$ /willkommen/
+RedirectMatch 301 ^/onboarding/?$ /
 
 ErrorDocument 404 /index.html
 
