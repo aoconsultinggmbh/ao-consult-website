@@ -63,6 +63,24 @@ jobs:
       - name: Dateien holen
         if: steps.pruefen.outputs.bereit == 'ja'
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Jede Datei bekommt das Datum ihrer letzten Aenderung im Projekt.
+      # Ohne diesen Schritt tragen alle Dateien das Datum des Auscheckens,
+      # und lftp haelt jedes Mal ALLE Dateien fuer geaendert und laedt die
+      # komplette Seite neu hoch (gemessen 07.10.2026: ein halb hochgeladenes
+      # Teambild war minutenlang kaputt zu sehen). Mit echten Zeitstempeln
+      # gehen nur die Dateien ueber die Leitung, die sich wirklich geaendert haben.
+      - name: Zeitstempel aus der Projekt-Historie setzen
+        if: steps.pruefen.outputs.bereit == 'ja'
+        run: |
+          anzahl=0
+          while IFS= read -r -d '' f; do
+            t=$(git log -1 --format=%ct -- "$f")
+            if [ -n "$t" ]; then touch -d "@$t" "$f"; anzahl=$((anzahl+1)); fi
+          done < <(git ls-files -z website)
+          echo "Zeitstempel gesetzt fuer $anzahl Dateien."
 
       - name: Upload-Werkzeug installieren (lftp)
         if: steps.pruefen.outputs.bereit == 'ja'
@@ -84,6 +102,11 @@ jobs:
       #                                 statt faelschlich "erfolgreich" zu melden
       #   open + user (zwei Zeilen)     vertraegt Passwoerter mit Komma oder @,
       #                                 anders als "open -u benutzer,passwort"
+      #   xfer:use-temp-file true       jede Datei wird erst als "name.hochladen"
+      #                                 uebertragen und dann umbenannt. Besucher
+      #                                 sehen so nie eine halb hochgeladene Datei
+      #                                 (kaputtes Bild), sondern immer die alte
+      #                                 oder die fertige neue.
       #
       # --delete raeumt Dateien weg, die es im Projekt nicht mehr gibt.
       # Das ist gewollt: im Zielordner liegt ausschliesslich diese Webseite.
@@ -105,6 +128,8 @@ jobs:
           set net:timeout 25
           set net:reconnect-interval-base 5
           set xfer:clobber on
+          set xfer:use-temp-file true
+          set xfer:temp-file-name *.hochladen
           set cmd:fail-exit true
           open "$SERVER"
           user "$BENUTZER" "$PASSWORT"
