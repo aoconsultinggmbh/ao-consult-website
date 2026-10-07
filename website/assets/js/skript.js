@@ -23,6 +23,7 @@
     var setzeMenue = function (offen) {
       nav.classList.toggle('offen', offen);
       burger.setAttribute('aria-expanded', offen ? 'true' : 'false');
+      document.documentElement.classList.toggle('menue-offen', offen);
       burger.setAttribute('aria-label', offen ? 'Menü schließen' : 'Menü öffnen');
       document.documentElement.style.overflow = offen ? 'hidden' : '';
     };

@@ -162,8 +162,13 @@ a.knopf--primaer:hover::after{transform:translateX(5px)}
 .tel-link svg{width:1.25em;height:1.25em;color:var(--blau)}
 
 /* ---------- Kopf (über dem Hero transparent, beim Scrollen weiß) ---------- */
-.kopf{position:fixed;left:0;right:0;top:1.55rem;z-index:100;padding:.9rem 0;transition:background .3s,box-shadow .3s,padding .3s,top .3s}
-.kopf.geschrumpft{background:rgba(255,255,255,.96);box-shadow:0 1px 0 var(--linie);padding:.55rem 0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.kopf{position:fixed;left:0;right:0;top:0;z-index:100;padding:.9rem 0;transition:background .3s,box-shadow .3s,padding .3s,top .3s}
+.kopf.geschrumpft{background:rgba(255,255,255,.96);box-shadow:0 1px 0 var(--linie);padding:.55rem 0}
+/* Der Weichzeichner liegt auf einem Hilfselement, nicht auf dem Kopf selbst.
+   Ein backdrop-filter direkt auf .kopf macht den Kopf zum Bezugsrahmen für das
+   fest positionierte Handy-Menü: das Menü wäre dann nur so hoch wie die
+   Kopfzeile und darin scrollbar, statt den ganzen Bildschirm zu füllen. */
+.kopf.geschrumpft::before,.kopf--hell::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .kopf__innen{width:min(1440px,100% - 3rem);margin-inline:auto;display:flex;align-items:center;gap:2rem;min-height:64px}
 .marke{position:relative;z-index:95;display:block}
 .marke img{width:auto;height:58px;transition:height .3s}
@@ -177,7 +182,7 @@ a.knopf--primaer:hover::after{transform:translateX(5px)}
 .nav__liste a{display:block;padding:.55rem .85rem;color:#fff;text-decoration:none;font-family:var(--schrift-kopf);font-weight:500;font-size:.95rem;white-space:nowrap;border-radius:var(--radius);position:relative;transition:color .2s;opacity:.92}
 .nav__liste a:hover,.nav__liste a:focus-visible{opacity:1;color:var(--blau-hell)}
 /* Seiten ohne dunklen Kopfbereich: der Kopf steht sofort hell */
-.kopf--hell{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--linie)}
+.kopf--hell{background:rgba(255,255,255,.92);box-shadow:0 1px 0 var(--linie)}
 .kopf--hell .marke__weiss{display:none}
 .kopf--hell .marke__schwarz{display:block}
 .kopf--hell .nav__liste a,.kopf--hell .kopf__tel{color:var(--kopf)}
@@ -210,14 +215,21 @@ a.knopf--primaer:hover::after{transform:translateX(5px)}
 .burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
 
 @media (max-width:1279px){
-  .nav{position:fixed;visibility:hidden;inset:0 0 0 auto;width:min(380px,100%);background:#fff;padding:8.5rem 1.5rem 2rem;transform:translateX(100%);transition:transform .4s var(--ease),visibility 0s .4s;box-shadow:-20px 0 60px -30px rgba(var(--schleier),.4);overflow:auto;z-index:90}
+  .nav{position:fixed;visibility:hidden;inset:0 0 0 auto;width:min(380px,100%);background:#fff;padding:7rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0px));transform:translateX(100%);transition:transform .4s var(--ease),visibility 0s .4s;box-shadow:-20px 0 60px -30px rgba(var(--schleier),.4);overflow:auto;z-index:90}
   .nav.offen{transform:none;visibility:visible;transition:transform .4s var(--ease),visibility 0s}
   .nav__liste{flex-direction:column;gap:.25rem}
-  .nav__liste a,.kopf.geschrumpft .nav__liste a{font-size:1.2rem;padding:.9rem 1rem;color:var(--kopf);opacity:1}
+  .nav__liste a,.kopf.geschrumpft .nav__liste a{font-size:1.2rem;padding:.7rem 1rem;color:var(--kopf);opacity:1}
+  /* Auf kleinen Handys (iPhone SE, Browserleisten eingeblendet) soll das ganze
+     Menü ohne Scrollen sichtbar sein */
+  @media (max-height:620px){.nav{padding-top:6rem}.nav__liste a,.kopf.geschrumpft .nav__liste a{font-size:1.1rem;padding:.5rem 1rem}}
   .nav__mobil{display:block;margin-top:.5rem}
   .nav__mobil .knopf{display:flex;background:var(--blau);color:#fff;font-size:1.05rem}
   .nav__mobil .knopf:hover{background:var(--blau-dunkel);color:#fff}
+  /* Die Farbregeln des Kopfes (.kopf--hell .nav__liste a) sind spezifischer als .nav__mobil .knopf und färbten die Schrift dunkel */
+  .kopf .nav__liste .nav__mobil a.knopf,.kopf .nav__liste .nav__mobil a.knopf:hover{color:#fff}
   .burger{display:flex;position:relative;z-index:95}
+  /* Solange das Menü offen ist, weicht der runde Barrierefreiheits-Knopf, sonst liegt er über dem Knopf „Offene Stellen“ */
+  html.menue-offen .bf-knopf{visibility:hidden}
   .kopf__tel{display:none}
 }
 @media (max-width:560px){.kopf__cta{display:none}.kopf__innen{min-height:56px}.marke img,.kopf.geschrumpft .marke img{height:46px}}
@@ -933,8 +945,8 @@ body > .fuss{background:var(--fuss);color:rgba(255,255,255,.7);padding:3.5rem 0 
 .kopf__wa svg{width:1.1rem;height:1.1rem;color:var(--wa-hell)}
 .kopf__wa:hover,.kopf__wa:focus-visible{background:var(--wa);border-color:var(--wa);color:#fff}
 .kopf__wa:hover svg,.kopf__wa:focus-visible svg{color:#fff}
-.kopf--schlicht.geschrumpft .kopf__wa{color:var(--wa-dunkel);border-color:rgba(18,140,126,.45);background:rgba(37,211,102,.12)}
-.kopf--schlicht.geschrumpft .kopf__wa svg{color:var(--wa-dunkel)}
+.kopf--hell .kopf__wa,.kopf--schlicht.geschrumpft .kopf__wa{color:var(--wa-dunkel);border-color:rgba(18,140,126,.45);background:rgba(37,211,102,.12)}
+.kopf--hell .kopf__wa svg,.kopf--schlicht.geschrumpft .kopf__wa svg{color:var(--wa-dunkel)}
 .kopf--schlicht.geschrumpft .kopf__wa:hover{color:#fff}
 .kopf--schlicht.geschrumpft .kopf__wa:hover svg{color:#fff}
 @media (max-width:560px){
