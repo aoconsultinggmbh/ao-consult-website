@@ -26,22 +26,6 @@ Dazu 91 Bilder, Schriften (Poppins, Roboto, Caveat) lokal im Paket, ein gemeinsa
 Stylesheet und acht Skripte — darunter unsere Bausteine für Einwilligung und
 Barrierefreiheit sowie ein 3D-Kiefermodell (three.js).
 
-## Der Ordner `website/urlaub/` — bitte lesen
-
-Das ist der **interne Urlaubsantrag**, kein Teil der öffentlichen Seite.
-
-- Der Vorschau-Ablauf **löscht diesen Ordner beim Veröffentlichen**. Er liegt also
-  nie unter der Vorschau-Adresse. Das ist Absicht und darf nicht geändert werden.
-- Die Zapier-Adresse steht als Platzhalter (`ZAPIER_HOOK_URL_HIER_EINTRAGEN`) in der
-  Datei. Solange der drin ist, verschickt die Seite nichts.
-- **Die echte Adresse gehört nicht in dieses öffentliche Projekt.** Sie kommt als
-  GitHub-Secret `ZAPIER_URLAUB` hinein und wird im Livegang-Ablauf eingesetzt.
-  Dazu im KAS ein Verzeichnisschutz auf `/urlaub`.
-- Secret anlegen: Projekt -> **Settings** -> **Secrets and variables** -> **Actions** ->
-  **New repository secret** -> Name `ZAPIER_URLAUB`, Wert die Adresse aus Zapier
-  (Zap „Urlaubsantrag Webseite -> Asana“, Schritt 1, „Your webhook URL“). Ovidiu hat sie.
-- Fehlt das Secret, laesst der Livegang-Ablauf den Ordner `urlaub/` bewusst weg.
-
 ## Der Ordner `website/willkommen/` — Kunden-Willkommensseite
 
 Die Seite fuer neue Kunden mit den naechsten Schritten und dem SEPA-Lastschriftformular.
@@ -69,14 +53,13 @@ nicht in der Sitemap, nicht im Menue. Der Link wird den Kunden von uns geschickt
 
 ## Vor dem Livegang zu erledigen
 
-- [ ] **`noindex` aus allen 20 Seiten entfernen** — außer aus `urlaub/`.
+- [ ] **`noindex` aus allen Seiten entfernen.**
       Derzeit steht es in jeder Seite, richtig für die Vorschau, falsch für live.
 - [ ] **`robots.txt` und `sitemap.xml`** liegen bereit und zeigen auf `ao-consult.de`.
       Erst nach dem Entfernen von `noindex` sinnvoll.
 - [ ] **Kontaktformulare** prüfen und scharf schalten (Empfänger, PHP-Versand, Honeypot).
 - [ ] **Impressum, Datenschutz und AGB** gegenlesen lassen.
 - [ ] **3D-Kiefermodell:** Die GLB-Datei fehlt, das Skript erwartet sie. Bei Ovi nachfragen.
-- [ ] **Urlaubsantrag:** Secret setzen, Verzeichnisschutz im KAS anlegen.
 - [ ] **Willkommensseite:** SPF pruefen, Testmandat an buchhaltung@ schicken.
 - [ ] **Umzug planen:** alte Adressen von `ao-consult.de` weiterleiten, damit keine
       Google-Platzierung verloren geht.

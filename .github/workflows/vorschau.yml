@@ -38,9 +38,6 @@ jobs:
       - name: Vorschau-Version bauen (noindex einfuegen)
         run: |
           rm -rf _vorschau && cp -r website _vorschau
-          # Der Urlaubsantrag gehoert NICHT in die oeffentliche Vorschau.
-          # Er ist erst live sinnvoll, dort hinter Verzeichnisschutz im KAS.
-          rm -rf _vorschau/urlaub
           # Jede HTML-Seite: Suchmaschinen aussperren
           while IFS= read -r f; do
             # vorhandenen robots-Hinweis ersetzen ...
