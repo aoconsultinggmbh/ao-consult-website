@@ -82,6 +82,22 @@ jobs:
           done < <(git ls-files -z website)
           echo "Zeitstempel gesetzt fuer $anzahl Dateien."
 
+      # Schluessel fuer Close und Brevo (Magazin-Formular) aus den GitHub-Secrets
+      # CLOSE_API_KEY und BREVO_API_KEY in eine PHP-Datei schreiben, die nur auf
+      # dem Server liegt. Sie steht nie im Projekt (das Projekt ist oeffentlich)
+      # und ist von aussen gesperrt (.htaccess). Fehlt ein Secret, bleibt der
+      # Wert leer und magazin.php meldet dem Team, was von Hand zu tun ist.
+      - name: Schluessel fuer Close und Brevo bereitlegen
+        if: steps.pruefen.outputs.bereit == 'ja'
+        env:
+          CLOSE_API_KEY: ${{ secrets.CLOSE_API_KEY }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: |
+          mkdir -p website/_konfig
+          php -r 'file_put_contents("website/_konfig/schluessel.php", "<?php\n// Automatisch beim Livegang erzeugt. Nicht von Hand aendern.\nreturn " . var_export(["close" => (string)getenv("CLOSE_API_KEY"), "brevo" => (string)getenv("BREVO_API_KEY")], true) . ";\n");'
+          printf 'Require all denied\n' > website/_konfig/.htaccess
+          echo "Close: $([ -n "$CLOSE_API_KEY" ] && echo hinterlegt || echo fehlt) · Brevo: $([ -n "$BREVO_API_KEY" ] && echo hinterlegt || echo fehlt)"
+
       - name: Upload-Werkzeug installieren (lftp)
         if: steps.pruefen.outputs.bereit == 'ja'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
