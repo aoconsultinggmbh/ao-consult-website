@@ -2,8 +2,8 @@
 /*
  * Nimmt das Formular auf /teamprophylaxe-magazin/ entgegen.
  *  1. prueft die Angaben
- *  2. schickt dem Besucher eine Mail im AO-Design mit dem Download-Link
- *     (signiert, 30 Tage gueltig, siehe download.php)
+ *  2. schickt dem Besucher die Download-Mail im AO-Design (mail-magazin.php),
+ *     Link signiert und 30 Tage gueltig (siehe download.php)
  *  3. schickt dem Team eine Info-Mail an service@ mit allen Angaben
  * Speichert nichts auf dem Server.
  *
@@ -75,22 +75,12 @@ $titelListe = implode(', ', array_map(function ($x) { return $x['titel']; }, $ge
 $schluessel = ao_magazin_schluessel();
 $mailOk = false;
 if ($schluessel !== '') {
-    $knoepfe = [];
-    foreach ($gewaehlt as $nr => $x) {
-        $knoepfe[] = [count($gewaehlt) > 1 ? $x['titel'] . ' herunterladen' : 'Magazin herunterladen (PDF)', ao_magazin_link($nr, $email, $schluessel)];
-    }
-    $absaetze = [
-        'vielen Dank für Ihr Interesse an Teamprophylaxe, dem Magazin gegen Lücken im Team.',
-        (count($gewaehlt) > 1 ? 'Mit den Knöpfen unten laden Sie Ihre Ausgaben als PDF herunter.' : 'Mit dem Knopf unten laden Sie ' . $titelListe . ' als PDF herunter.')
-            . ' Der Link gilt ' . AO_MAGAZIN_LINK_TAGE . ' Tage.',
-    ];
-    if ($newsletter) {
-        $absaetze[] = 'Sie möchten auch die nächsten Ausgaben bekommen. Das freut uns. Sobald eine neue Ausgabe erscheint, schicken wir sie Ihnen per E-Mail.';
-    }
-    $absaetze[] = 'Fragen oder Anregungen zum Magazin? Antworten Sie einfach auf diese E-Mail.';
-
-    require_once __DIR__ . '/mail-bestaetigung.php';
-    $mailOk = ao_bestaetigung_senden($email, 'magazin', $ABSENDER, ['absaetze' => $absaetze, 'knoepfe' => $knoepfe]);
+    $mitLink = [];
+    foreach ($gewaehlt as $nr => $x) $mitLink[$nr] = $x + ['link' => ao_magazin_link($nr, $email, $schluessel)];
+    require_once __DIR__ . '/mail-magazin.php';
+    $mailOk = ao_magazin_mail_senden($email, $ABSENDER, [
+        'vorname' => $vorname, 'nachname' => $nachname, 'ausgaben' => $mitLink, 'newsletter' => $newsletter,
+    ]);
 }
 
 // ---- 2. Close ----------------------------------------------------------------

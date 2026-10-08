@@ -9,6 +9,8 @@
  *  2. Hier einen Eintrag ergaenzen ("datei" = Dateiname genau wie hochgeladen).
  *  3. Auf der Seite /teamprophylaxe-magazin/ die Ausgabe und das Haekchen im
  *     Formular ergaenzen (value = Schluessel hier, z. B. "02").
+ *  4. Titelbild fuer die Mail als JPG (360 px breit) unter img/teamprophylaxe-magazin/
+ *     ablegen und bei "mailbild" eintragen, Inhalt (3 Punkte) bei "inhalt".
  */
 if (!defined('AO_MAGAZIN')) { http_response_code(404); exit; }
 
@@ -25,6 +27,13 @@ $AO_AUSGABEN = [
         'thema'    => 'Die beste Zeit, eine ZFA zu suchen, ist, wenn Sie keine brauchen.',
         'datei'    => 'AO_Teamprophylaxe_Magazin_Ausgabe01_v7.pdf',
         'download' => 'Teamprophylaxe-Magazin-Ausgabe-01-Herbst-2026.pdf',
+        // fuer die Download-Mail (mail-magazin.php)
+        'mailbild' => 'img/teamprophylaxe-magazin/teamprophylaxe-magazin-ausgabe-01-titel-mail.jpg',
+        'inhalt'   => [
+            ['Seite 4',  'Befund',   'Vier Wochen Frist, vier Monate Suche'],
+            ['Seite 8',  'Anamnese', 'Der Teamstatus zum Ausfüllen'],
+            ['Seite 12', 'Recall',   'Ihr Plan für die nächsten 90 Tage'],
+        ],
     ],
 ];
 
