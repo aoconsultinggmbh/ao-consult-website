@@ -46,6 +46,7 @@ $webseite    = wert('webseite', 200);
 $email       = wert('email', 200);
 $telefon     = wert('telefon', 60);
 $newsletter  = wert('newsletter') !== '';
+$anruf       = wert('anruf') !== '';
 $datenschutz = wert('datenschutz') !== '';
 
 foreach ([$vorname, $nachname, $praxis, $webseite, $email, $telefon] as $p) {
@@ -86,7 +87,7 @@ if ($schluessel !== '') {
 // ---- 2. Close ----------------------------------------------------------------
 $closeBericht = ao_close_eintragen([
     'vorname' => $vorname, 'nachname' => $nachname, 'praxis' => $praxis, 'webseite' => $webseite,
-    'email' => $email, 'telefon' => $telefon, 'newsletter' => $newsletter, 'ausgaben' => $titelListe,
+    'email' => $email, 'telefon' => $telefon, 'newsletter' => $newsletter, 'anruf' => $anruf, 'ausgaben' => $titelListe,
 ]);
 
 // ---- 3. Info-Mail an das Team ----------------------------------------------
@@ -99,6 +100,7 @@ $text = "Magazin angefordert über ao-consult.de/teamprophylaxe-magazin/\n\n"
       . str_pad('Telefon:', 16) . $telefon . "\n"
       . str_pad('Ausgabe:', 16) . $titelListe . "\n"
       . str_pad('Newsletter:', 16) . ($newsletter ? 'ja, möchte jede neue Ausgabe' : 'nein') . "\n"
+      . str_pad('Anrufen:', 16) . ($anruf ? 'ja, darf angerufen werden' : 'nein, nur per E-Mail') . "\n"
       . str_pad('Datenschutz:', 16) . "zugestimmt\n\n"
       . ($mailOk ? "Der Download-Link ist per E-Mail rausgegangen.\n"
                  : "ACHTUNG: Die Download-Mail konnte NICHT verschickt werden. Bitte das Magazin von Hand schicken.\n")

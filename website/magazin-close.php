@@ -168,6 +168,7 @@ function ao_close_eintragen($d) {
             'lead_id' => $leadId,
             'note'    => 'Teamprophylaxe-Magazin über die Webseite angefordert: ' . $d['ausgaben']
                        . '. Newsletter: ' . ($d['newsletter'] ? 'ja' : 'nein') . '.'
+                       . ' Anrufen: ' . (!empty($d['anruf']) ? 'ja, ausdrücklich erlaubt' : 'nein, nur per E-Mail') . '.'
                        . ' Person: ' . $kontakt['name'] . ', ' . $d['email'] . ', ' . $d['telefon'] . '.',
         ]);
         return $bericht . '.' . "\n  https://app.close.com/lead/$leadId/";
