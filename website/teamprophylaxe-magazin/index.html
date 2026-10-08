@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="index, follow">
+<!-- Vorerst nicht in Google, bis Ovidiu freigibt (Wunsch Admir, 08.10.2026). Danach: index, follow und Eintrag in sitemap.xml. -->
+<meta name="robots" content="noindex, follow">
 <title>Teamprophylaxe: Das Magazin gegen Lücken im Team · AO Consulting</title>
 <meta name="description" content="Teamprophylaxe ist das Magazin von AO Consulting für Inhaberinnen und Inhaber von Zahnarztpraxen. Jedes Quartal eine neue Ausgabe, kostenlos per E-Mail.">
 <meta name="theme-color" content="#2b87da">
@@ -244,8 +245,12 @@ window.AO_EINWILLIGUNG = {
         <label for="m-newsletter"><strong>Ja, schicken Sie mir jede neue Ausgabe per E-Mail.</strong> Abmelden geht jederzeit.</label>
       </div>
       <div class="feld feld--check">
+        <input id="m-anruf" name="anruf" type="checkbox" value="ja">
+        <label for="m-anruf">Sie dürfen mich gern auch anrufen, um über das Magazin und meine Praxis zu sprechen.</label>
+      </div>
+      <div class="feld feld--check">
         <input id="m-ok" name="datenschutz" type="checkbox" required>
-        <label for="m-ok">Ich bin einverstanden, dass AO Consulting meine Angaben speichert, um mir das Magazin zu schicken, und mich dazu telefonisch oder per E-Mail kontaktiert. Diese Einwilligung kann ich jederzeit widerrufen. Die <a href="/datenschutzerklaerung/">Datenschutzhinweise</a> habe ich gelesen. <span aria-hidden="true">*</span></label>
+        <label for="m-ok">Ich bin einverstanden, dass AO Consulting meine Angaben speichert, um mir das Magazin zu schicken, und mich dazu per E-Mail kontaktiert. Diese Einwilligung kann ich jederzeit widerrufen. Die <a href="/datenschutzerklaerung/">Datenschutzhinweise</a> habe ich gelesen. <span aria-hidden="true">*</span></label>
         <p class="fehler" id="m-ok-fehler" hidden>Ohne Ihre Einwilligung dürfen wir Ihnen das Magazin nicht schicken.</p>
       </div>
       <button class="knopf knopf--primaer knopf--gross knopf--breit" type="submit">Jetzt kostenlos anfordern</button>
