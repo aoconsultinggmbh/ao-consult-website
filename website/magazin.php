@@ -7,10 +7,10 @@
  *  3. schickt dem Team eine Info-Mail an service@ mit allen Angaben
  * Speichert nichts auf dem Server.
  *
- * Close (Kontakt anlegen, Aktivitaet "Magazin") und Brevo (Newsletter mit
- * Bestaetigungsmail) kommen im naechsten Schritt dazu, sobald die
- * API-Schluessel hinterlegt sind. Bis dahin steht in der Info-Mail, was das
- * Team von Hand eintragen muss.
+ *  4. traegt die Person in Close ein (magazin-close.php)
+ * Brevo (Newsletter mit Bestaetigungsmail) kommt im naechsten Schritt.
+ * Klappt Close nicht oder fehlt der Schluessel, steht in der Info-Mail,
+ * was das Team von Hand eintragen muss.
  */
 $EMPFAENGER    = 'service@ao-consult.de';
 $ABSENDER      = 'service@ao-consult.de';
@@ -18,6 +18,7 @@ $ABSENDER_NAME = 'AO Consulting Webseite';
 
 define('AO_MAGAZIN', true);
 require __DIR__ . '/magazin-ausgaben.php';
+require __DIR__ . '/magazin-close.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -92,7 +93,13 @@ if ($schluessel !== '') {
     $mailOk = ao_bestaetigung_senden($email, 'magazin', $ABSENDER, ['absaetze' => $absaetze, 'knoepfe' => $knoepfe]);
 }
 
-// ---- 2. Info-Mail an das Team ----------------------------------------------
+// ---- 2. Close ----------------------------------------------------------------
+$closeBericht = ao_close_eintragen([
+    'vorname' => $vorname, 'nachname' => $nachname, 'praxis' => $praxis, 'webseite' => $webseite,
+    'email' => $email, 'telefon' => $telefon, 'newsletter' => $newsletter, 'ausgaben' => $titelListe,
+]);
+
+// ---- 3. Info-Mail an das Team ----------------------------------------------
 $text = "Magazin angefordert über ao-consult.de/teamprophylaxe-magazin/\n\n"
       . str_pad('Vorname:', 16) . $vorname . "\n"
       . str_pad('Nachname:', 16) . $nachname . "\n"
@@ -105,9 +112,12 @@ $text = "Magazin angefordert über ao-consult.de/teamprophylaxe-magazin/\n\n"
       . str_pad('Datenschutz:', 16) . "zugestimmt\n\n"
       . ($mailOk ? "Der Download-Link ist per E-Mail rausgegangen.\n"
                  : "ACHTUNG: Die Download-Mail konnte NICHT verschickt werden. Bitte das Magazin von Hand schicken.\n")
-      . "\nBitte in Close eintragen (solange das noch nicht automatisch passiert):\n"
-      . "  - Lead/Kontakt suchen (E-Mail, Praxis, Webseite), sonst neu anlegen, Quelle: Teamprophylaxe Magazin\n"
-      . "  - Aktivität \"Magazin\" anlegen, Mazagin: " . ($newsletter ? 'Ja' : 'Nein') . ", anpinnen\n\n"
+      . "\nClose: " . $closeBericht . "\n"
+      . (strpos($closeBericht, 'von Hand') !== false
+          ? "  Von Hand: Lead suchen (E-Mail, Praxis, Webseite), sonst anlegen mit Quelle \"Teamprophylaxe Magazin\",\n"
+            . "  Aktivität \"Magazin\" anlegen (Mazagin: " . ($newsletter ? 'Ja' : 'Nein') . ") und anpinnen.\n"
+          : '')
+      . "\n"
       . "Gesendet:  $zeit (Serverzeit)\nIP:        $ip\n\n"
       . "Diese Nachricht wurde automatisch von der Webseite erzeugt. Antworten gehen direkt an die angegebene Adresse.\n";
 $kopf  = "From: =?UTF-8?B?" . base64_encode($ABSENDER_NAME) . "?= <$ABSENDER>\r\n"
