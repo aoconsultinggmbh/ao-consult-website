@@ -129,6 +129,34 @@ function ao_close_lead_finden($email, $domain, $praxis) {
     return null;
 }
 
+function ao_ziffern($tel) {
+    $z = preg_replace('/\D/', '', (string)$tel);
+    if (strpos($z, '0049') === 0) $z = '0' . substr($z, 4);
+    elseif (strpos($z, '49') === 0 && strlen($z) > 10) $z = '0' . substr($z, 2);
+    return $z;
+}
+
+// Ergaenzt einen vorhandenen Kontakt um neue Telefonnummer/E-Mail.
+// Vorhandene Eintraege bleiben stehen (nichts wird ueberschrieben).
+// Liefert eine kurze Beschreibung der Aenderung oder ''.
+function ao_close_kontakt_ergaenzen($c, $email, $telefon) {
+    $emails = (array)($c['emails'] ?? []);
+    $phones = (array)($c['phones'] ?? []);
+    $neu = [];
+    $hatMail = false;
+    foreach ($emails as $e) if (mb_strtolower($e['email'] ?? '') === mb_strtolower($email)) $hatMail = true;
+    if (!$hatMail) { $emails[] = ['type' => 'office', 'email' => $email]; $neu[] = 'E-Mail ' . $email; }
+    $hatTel = false;
+    foreach ($phones as $ph) if (ao_ziffern($ph['phone'] ?? '') === ao_ziffern($telefon)) $hatTel = true;
+    if (!$hatTel && ao_ziffern($telefon) !== '') { $phones[] = ['type' => 'office', 'phone' => $telefon]; $neu[] = 'Telefon ' . $telefon; }
+    if (!$neu) return '';
+    $saubere = function ($liste, $feld) {
+        return array_values(array_map(function ($x) use ($feld) { return ['type' => $x['type'] ?? 'office', $feld => $x[$feld]]; }, $liste));
+    };
+    ao_close('PUT', 'contact/' . $c['id'] . '/', ['emails' => $saubere($emails, 'email'), 'phones' => $saubere($phones, 'phone')]);
+    return 'Kontakt ergänzt: ' . implode(', ', $neu);
+}
+
 function ao_close_eintragen($d) {
     if (ao_schluessel('close') === '') return 'Close ist noch nicht angebunden (kein Schlüssel). Bitte von Hand eintragen.';
     try {
@@ -141,18 +169,30 @@ function ao_close_eintragen($d) {
         if ($fund) {
             [$lead, $kontaktId, $wie] = $fund;
             $leadId = $lead['id'];
-            if (!$kontaktId) {
-                // Person am Lead suchen (gleicher Name), sonst neu anlegen
-                foreach ((array)($lead['contacts'] ?? []) as $c) {
-                    if (ao_normal($c['name'] ?? '') === ao_normal($kontakt['name'])) { $kontaktId = $c['id']; break; }
-                }
-                if (!$kontaktId) {
-                    $c = ao_close('POST', 'contact/', $kontakt + ['lead_id' => $leadId]);
-                    $kontaktId = $c['id'] ?? null;
-                    $wie .= ', Kontakt neu angelegt';
-                }
+            // Vollstaendigen Lead holen (alle Kontakte mit Nummern und Adressen)
+            $voll = ao_close('GET', 'lead/' . $leadId . '/?_fields=id,display_name,url,contacts');
+            if (!empty($voll['contacts'])) $lead['contacts'] = $voll['contacts'];
+            $kontaktObj = null;
+            foreach ((array)($lead['contacts'] ?? []) as $c) {
+                if ($kontaktId && $c['id'] === $kontaktId) { $kontaktObj = $c; break; }
+                if (!$kontaktId && ao_normal($c['name'] ?? '') === ao_normal($kontakt['name'])) { $kontaktObj = $c; $kontaktId = $c['id']; break; }
             }
-            $bericht = 'Vorhandener Lead gefunden (über ' . $wie . '): ' . ($lead['display_name'] ?? $leadId);
+            $aenderung = '';
+            if ($kontaktObj) {
+                // Bekannte Person: neue Nummer/E-Mail ergaenzen
+                $aenderung = ao_close_kontakt_ergaenzen($kontaktObj, $d['email'], $d['telefon']);
+            } else {
+                $c = ao_close('POST', 'contact/', $kontakt + ['lead_id' => $leadId]);
+                $kontaktId = $c['id'] ?? null;
+                $aenderung = 'Kontakt ' . $kontakt['name'] . ' neu angelegt';
+            }
+            // Webseite nachtragen, wenn am Lead noch keine steht
+            if (trim((string)($voll['url'] ?? $lead['url'] ?? '')) === '' && $d['webseite'] !== '') {
+                ao_close('PUT', 'lead/' . $leadId . '/', ['url' => $d['webseite']]);
+                $aenderung .= ($aenderung ? ', ' : '') . 'Webseite ergänzt';
+            }
+            $bericht = 'Vorhandener Lead gefunden (über ' . $wie . '): ' . ($lead['display_name'] ?? $leadId)
+                     . ($aenderung ? '. ' . $aenderung : '. Kontaktdaten waren aktuell');
         } else {
             $neu = ao_close('POST', 'lead/', [
                 'name'     => $d['praxis'],
@@ -165,11 +205,12 @@ function ao_close_eintragen($d) {
             $bericht = 'Neuer Lead angelegt: ' . $d['praxis'];
         }
 
-        // Aktivitaet "Magazin": vorhandene nutzen, sonst neu.
-        // Mit Double-Opt-in steht "Mazagin" erst nach dem Klick in der
-        // Bestaetigungsmail auf Ja (magazin-bestaetigt.php).
+        // Aktivitaet "Magazin": Wer das Magazin anfordert, steht auf "Mazagin: Ja"
+        // (Wunsch Admir, 09.10.2026). Vorhandene Aktivitaet wird auf Ja gesetzt,
+        // sonst neu angelegt und angepinnt. Ob der Newsletter bestaetigt ist,
+        // steht in der Notiz.
         $status = $d['newsletter_status'] ?? ($d['newsletter'] ? 'ja' : 'nein');
-        $wert = $status === 'ja' ? 'Ja' : 'Nein';
+        $wert = 'Ja';
         $vorhanden = ao_close('GET', 'activity/custom/?' . http_build_query([
             'lead_id' => $leadId, 'custom_activity_type_id' => AO_CLOSE_TYP_MAGAZIN, '_limit' => 1,
         ]));
