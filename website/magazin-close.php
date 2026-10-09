@@ -52,20 +52,62 @@ function ao_domain($url) {
 }
 
 // Leads per Volltextsuche holen, Felder fuer die Gegenpruefung mitnehmen
-function ao_close_leads_suchen($text) {
+function ao_close_leads_suchen($text, $limit = 25) {
     $r = ao_close('GET', 'lead/?' . http_build_query([
         'query'   => $text,
-        '_limit'  => 10,
+        '_limit'  => $limit,
         '_fields' => 'id,display_name,url,contacts,custom',
     ]));
     return isset($r['data']) ? $r['data'] : [];
 }
 
+// Leads mit genau dieser E-Mail-Adresse an einem Kontakt (Erweiterte Suche von Close).
+// Die Volltextsuche taugt dafuer nicht: Die eigene Adresse steckt in hunderten Leads
+// (gesendete Mails), dann ist der richtige Lead nicht unter den ersten Treffern.
+function ao_close_leads_mit_email($email) {
+    $ids = [];
+    try {
+        $r = ao_close('POST', 'data/search/', [
+            'query' => ['type' => 'and', 'queries' => [
+                ['type' => 'object_type', 'object_type' => 'lead'],
+                ['type' => 'has_related', 'this_object_type' => 'lead', 'related_object_type' => 'contact',
+                 'related_query' => ['type' => 'and', 'queries' => [
+                    ['type' => 'has_related', 'this_object_type' => 'contact', 'related_object_type' => 'contact_email',
+                     'related_query' => ['type' => 'and', 'queries' => [
+                        ['type' => 'field_condition',
+                         'field' => ['type' => 'regular_field', 'object_type' => 'contact_email', 'field_name' => 'email'],
+                         'condition' => ['type' => 'text', 'mode' => 'phrase', 'value' => $email]],
+                     ]]],
+                 ]]],
+            ]],
+            '_fields' => ['lead' => ['id']],
+            'results_limit' => 20,
+        ]);
+        foreach ((array)($r['data'] ?? []) as $l) if (!empty($l['id'])) $ids[] = $l['id'];
+    } catch (AoCloseFehler $e) {
+        ao_protokoll('close-suche', false, 'Erweiterte Suche: ' . $e->getMessage());
+    }
+    if (!$ids) {
+        // Ersatz: alte Suchsprache, eng auf Kontakt-E-Mails
+        try {
+            foreach (ao_close_leads_suchen('email:"' . $email . '"', 50) as $l) $ids[] = $l['id'];
+        } catch (AoCloseFehler $e) {
+            ao_protokoll('close-suche', false, 'email-Suche: ' . $e->getMessage());
+        }
+    }
+    $treffer = [];
+    foreach (array_slice(array_unique($ids), 0, 20) as $id) {
+        $l = ao_close('GET', 'lead/' . $id . '/?_fields=id,display_name,url,contacts,custom');
+        if ($l) $treffer[] = $l;
+    }
+    return $treffer;
+}
+
 // Liefert [lead, contact_id|null, wie gefunden] oder null
 function ao_close_lead_finden($email, $domain, $praxis) {
     $email = mb_strtolower($email);
-    // 1. E-Mail-Adresse eines Kontakts
-    foreach (ao_close_leads_suchen('"' . $email . '"') as $l) {
+    // 1. E-Mail-Adresse eines Kontakts (jeder Treffer wird gegengeprueft)
+    foreach (ao_close_leads_mit_email($email) as $l) {
         foreach ((array)($l['contacts'] ?? []) as $c) {
             foreach ((array)($c['emails'] ?? []) as $e) {
                 if (mb_strtolower($e['email'] ?? '') === $email) return [$l, $c['id'], 'E-Mail'];
