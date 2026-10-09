@@ -4,7 +4,7 @@
    dem Versand auf die angegebene Seite geleitet (Danke-Seite), sonst erscheint der
    Dank im Formular. In der Vorschau (kein PHP) gibt es einen Hinweis statt Versand. */
 (function () {
-  Array.prototype.forEach.call(document.querySelectorAll('form[action$="formular.php"]'), function (f) {
+  Array.prototype.forEach.call(document.querySelectorAll('form[action$="formular.php"], form[action$="magazin.php"]'), function (f) {
     var danke = f.querySelector('.danke'),
         knopf = f.querySelector('button[type=submit]'),
         knopfText = knopf ? knopf.textContent : '',

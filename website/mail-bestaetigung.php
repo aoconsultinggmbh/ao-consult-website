@@ -1,7 +1,10 @@
 <?php
 /*
  * Eingangsbestaetigung im AO-Design (HTML-Mail mit Textfassung).
- * Wird nur von formular.php eingebunden, nie direkt aufgerufen.
+ * Wird nur von formular.php und magazin.php eingebunden, nie direkt aufgerufen.
+ *
+ * $extra (optional): 'absaetze' ersetzt die Absaetze, 'knoepfe' ist eine Liste
+ * aus [Beschriftung, Adresse] und ersetzt den einen Knopf (z. B. Download-Links).
  *
  * Aufbau der Mail: multipart/alternative
  *   1. Textfassung (fuer Programme ohne HTML)
@@ -10,9 +13,9 @@
  * Mailprogramm Bilder aus dem Internet blockiert.
  * Farben und Schriften wie auf ao-consult.de (stil.css).
  */
-if (!defined('AO_FORMULAR')) { http_response_code(404); exit; }
+if (!defined('AO_FORMULAR') && !defined('AO_MAGAZIN')) { http_response_code(404); exit; }
 
-function ao_bestaetigung_senden($an, $art, $absender) {
+function ao_bestaetigung_senden($an, $art, $absender, $extra = []) {
     $T = [
         'kontakt' => [
             'betreff' => 'Ihre Anfrage bei AO Consulting ist angekommen',
@@ -44,14 +47,22 @@ function ao_bestaetigung_senden($an, $art, $absender) {
             ],
             'knopf'   => ['Zum Empfehlungsprogramm', 'https://ao-consult.de/empfehlungsprogramm/'],
         ],
+        'magazin' => [
+            'betreff' => 'Ihr Teamprophylaxe-Magazin zum Herunterladen',
+            'titel'   => 'Ihr Magazin ist da',
+            'absaetze' => [],   // kommen aus magazin.php
+            'knopf'   => ['Zum Magazin', 'https://ao-consult.de/teamprophylaxe-magazin/'],
+        ],
     ];
     if (!isset($T[$art])) return false;
     $b = $T[$art];
+    if (!empty($extra['absaetze'])) $b['absaetze'] = $extra['absaetze'];
+    $knoepfe = !empty($extra['knoepfe']) ? $extra['knoepfe'] : [$b['knopf']];
     $h = function ($s) { return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); };
 
     // ---- Textfassung ------------------------------------------------------
     $text = "Guten Tag,\n\n" . implode("\n\n", $b['absaetze']) . "\n\n"
-          . $b['knopf'][0] . ":\n" . $b['knopf'][1] . "\n\n"
+          . implode('', array_map(function ($k) { return $k[0] . ":\n" . $k[1] . "\n\n"; }, $knoepfe))
           . "Ist es eilig? Montag bis Freitag erreichen Sie uns unter 0176 85933551.\n\n"
           . "Viele Grüße\nIhr Team von AO Consulting\n\n"
           . "--\nAO Consulting GmbH · Zeiloch 13 · 76646 Bruchsal\nhttps://ao-consult.de\n\n"
@@ -84,10 +95,13 @@ function ao_bestaetigung_senden($an, $art, $absender) {
       . $p
       . '</td></tr>'
       // Knopf
-      . '<tr><td style="padding:8px 40px 32px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>'
-      . '<td bgcolor="' . $blau . '" style="background:' . $blau . ';border-radius:3px;">'
-      . '<a href="' . $h($b['knopf'][1]) . '" style="display:inline-block;padding:14px 26px;font-family:' . $schrift . ';font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">' . $h($b['knopf'][0]) . ' &rarr;</a>'
-      . '</td></tr></table></td></tr>'
+      . implode('', array_map(function ($k) use ($h, $blau, $schrift) {
+            return '<tr><td style="padding:8px 40px 24px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>'
+              . '<td bgcolor="' . $blau . '" style="background:' . $blau . ';border-radius:3px;">'
+              . '<a href="' . $h($k[1]) . '" style="display:inline-block;padding:14px 26px;font-family:' . $schrift . ';font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">' . $h($k[0]) . ' &rarr;</a>'
+              . '</td></tr></table></td></tr>';
+        }, $knoepfe))
+      . '<tr><td style="height:8px;line-height:8px;font-size:0;">&nbsp;</td></tr>'
       // Eilig
       . '<tr><td style="padding:0 40px 36px;">'
       . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:' . $nebel . ';border-left:3px solid ' . $blau . ';padding:16px 20px;font-family:' . $schrift2 . ';font-size:15px;line-height:1.5;color:' . $textf . ';">'
