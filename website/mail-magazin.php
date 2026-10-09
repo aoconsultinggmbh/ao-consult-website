@@ -12,8 +12,10 @@
  */
 if (!defined('AO_MAGAZIN')) { http_response_code(404); exit; }
 
-function ao_magazin_mail_senden($an, $absender, $p) {
-    // $p: vorname, nachname, ausgaben (Liste aus magazin-ausgaben.php, mit 'link'), newsletter (bool)
+// Baut die Mail. Liefert [Betreff, HTML, Text, Bilder fuer cid:...]
+function ao_magazin_mail_bauen($p) {
+    // $p: vorname, nachname, ausgaben (Liste aus magazin-ausgaben.php, mit 'link'),
+    //     newsletter (bool), doi (bool: Bestaetigungsmail fuer den Newsletter kommt separat)
     $h = function ($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); };
     $erste = reset($p['ausgaben']);
     $mehrere = count($p['ausgaben']) > 1;
@@ -56,9 +58,9 @@ function ao_magazin_mail_senden($an, $absender, $p) {
         }
     }
 
-    $newsletterSatz = $p['newsletter']
-        ? 'Sie möchten auch die nächsten Ausgaben bekommen. Das freut uns. Sobald eine neue Ausgabe erscheint, schicken wir sie Ihnen per E-Mail.'
-        : '';
+    $newsletterSatz = !$p['newsletter'] ? '' : (!empty($p['doi'])
+        ? 'Sie möchten auch die nächsten Ausgaben bekommen. Das freut uns. Dafür kommt gleich eine zweite E-Mail: Bitte bestätigen Sie darin Ihre Anmeldung mit einem Klick.'
+        : 'Sie möchten auch die nächsten Ausgaben bekommen. Das freut uns. Sobald eine neue Ausgabe erscheint, schicken wir sie Ihnen per E-Mail.');
 
     $html = '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
       . '<meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><title>' . $h($betreff) . '</title>'
@@ -163,11 +165,30 @@ function ao_magazin_mail_senden($an, $absender, $p) {
           . "Viele Grüße\nAdmir & Ovidiu\nGründer der AO Consulting GmbH\n\n"
           . "--\nAO Consulting GmbH · Zeiloch 13 · 76646 Bruchsal · 0176 85933551\nhttps://ao-consult.de\n";
 
-    // ---- MIME ----------------------------------------------------------------
     $bilder = [
         'logo'  => [__DIR__ . '/img/mail-logo-ao-consulting.png', 'image/png', 'ao-consulting.png'],
         'titel' => [__DIR__ . '/' . ($erste['mailbild'] ?? ''), 'image/jpeg', 'teamprophylaxe-titel.jpg'],
     ];
+    $bilder['titel'][3] = 'https://ao-consult.de/' . ($erste['mailbild'] ?? '');
+    $bilder['logo'][3]  = 'https://ao-consult.de/img/mail-logo-ao-consulting.png';
+    return [$betreff, $html, $txt, $bilder];
+}
+
+// Verschickt die Mail: ueber Brevo, wenn der Schluessel da ist (Zustellung in
+// Brevo nachvollziehbar), sonst ueber den Webserver. Liefert [ok, Info].
+function ao_magazin_mail_senden($an, $absender, $p) {
+    [$betreff, $html, $txt, $bilder] = ao_magazin_mail_bauen($p);
+    if (function_exists('ao_brevo_aktiv') && ao_brevo_aktiv()) {
+        // Bei Brevo stehen die Bilder als Adresse im HTML statt in der Mail
+        foreach ($bilder as $cid => $b) $html = str_replace('cid:' . $cid, $b[3], $html);
+        [$ok, $info] = ao_brevo_mail($an, trim($p['vorname'] . ' ' . $p['nachname']), $betreff, $html, $txt, 'magazin-download');
+        if ($ok) return [true, 'Brevo ' . $info];
+        $brevoFehler = 'Brevo ' . $info . ', Ersatz über Webserver: ';
+    } else {
+        $brevoFehler = '';
+    }
+
+    // ---- MIME (Versand ueber den Webserver) ---------------------------------
     $g1 = 'alt_' . bin2hex(random_bytes(8));
     $g2 = 'rel_' . bin2hex(random_bytes(8));
     $body  = "--$g1\r\nContent-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n" . chunk_split(base64_encode($txt)) . "\r\n";
@@ -187,5 +208,6 @@ function ao_magazin_mail_senden($an, $absender, $p) {
           . "Content-Type: multipart/alternative; boundary=\"$g1\"\r\n"
           . "Auto-Submitted: auto-replied\r\n"
           . "X-Mailer: ao-consult.de/magazin\r\n";
-    return @mail($an, '=?UTF-8?B?' . base64_encode($betreff) . '?=', $body, $kopf, '-f ' . $absender);
+    $ok = @mail($an, '=?UTF-8?B?' . base64_encode($betreff) . '?=', $body, $kopf, '-f ' . $absender);
+    return [$ok, $brevoFehler . ($ok ? 'Webserver angenommen' : 'Webserver abgelehnt')];
 }

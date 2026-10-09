@@ -65,3 +65,62 @@ function ao_magazin_link($ausgabe, $email, $schluessel) {
     return 'https://ao-consult.de/download.php?a=' . rawurlencode($ausgabe)
          . '&e=' . ao_b64url(strtolower($email)) . '&t=' . $bis . '&s=' . $sig;
 }
+
+// ---------------------------------------------------------------------------
+// Protokoll: eine Zeile pro Schritt in magazin-dateien/protokoll.log
+// (ausserhalb der Webseite). E-Mail-Adressen nur gekuerzt, damit man Fehler
+// findet, ohne Daten zu sammeln. Datei wird bei 1 MB neu begonnen.
+// ---------------------------------------------------------------------------
+function ao_maske($email) {
+    $t = explode('@', (string)$email, 2);
+    return count($t) === 2 ? mb_substr($t[0], 0, 2) . '***@' . $t[1] : '***';
+}
+function ao_protokoll($schritt, $ok, $info = '') {
+    $f = AO_MAGAZIN_DATEIEN . '/protokoll.log';
+    if (!is_dir(AO_MAGAZIN_DATEIEN)) return;
+    if (is_file($f) && filesize($f) > 1048576) @rename($f, $f . '.alt');
+    $zeile = date('Y-m-d H:i:s') . ' | ' . str_pad($schritt, 14) . ' | ' . ($ok ? 'ok    ' : 'FEHLER') . ' | '
+           . preg_replace('/[\r\n]+/', ' ', mb_substr((string)$info, 0, 400)) . "\n";
+    @file_put_contents($f, $zeile, FILE_APPEND | LOCK_EX);
+}
+
+// ---------------------------------------------------------------------------
+// HTTP fuer Close und Brevo. Nutzt curl, sonst PHP-Streams.
+// Liefert [HTTP-Code, Antworttext, Fehlertext].
+// ---------------------------------------------------------------------------
+function ao_http($methode, $url, $kopf = [], $daten = null, $timeout = 12) {
+    $koerper = $daten === null ? null : json_encode($daten, JSON_UNESCAPED_UNICODE);
+    if ($koerper !== null) $kopf[] = 'Content-Type: application/json';
+    $kopf[] = 'Accept: application/json';
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_CUSTOMREQUEST  => $methode,
+            CURLOPT_HTTPHEADER     => $kopf,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => $timeout,
+        ]);
+        if ($koerper !== null) curl_setopt($ch, CURLOPT_POSTFIELDS, $koerper);
+        $antwort = curl_exec($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $fehler = curl_error($ch);
+        curl_close($ch);
+        return [$code, $antwort === false ? '' : $antwort, $fehler];
+    }
+    $ctx = stream_context_create(['http' => [
+        'method' => $methode, 'header' => implode("\r\n", $kopf), 'content' => (string)$koerper,
+        'timeout' => $timeout, 'ignore_errors' => true,
+    ]]);
+    $antwort = @file_get_contents($url, false, $ctx);
+    $code = 0;
+    foreach ((array)($http_response_header ?? []) as $z) if (preg_match('#^HTTP/\S+\s+(\d{3})#', $z, $m)) $code = (int)$m[1];
+    return [$code, $antwort === false ? '' : $antwort, $antwort === false ? 'keine Verbindung' : ''];
+}
+
+// Signierte Bestaetigungsadresse fuer den Newsletter (Double-Opt-in)
+function ao_newsletter_bestaetigungslink($email, $schluessel) {
+    $e = strtolower($email);
+    return 'https://ao-consult.de/magazin-bestaetigt.php?e=' . ao_b64url($e)
+         . '&s=' . hash_hmac('sha256', 'newsletter|' . $e, $schluessel);
+}

@@ -37,23 +37,10 @@ class AoCloseFehler extends Exception {}
 function ao_close($methode, $pfad, $daten = null) {
     // AO_CLOSE_TEST nur fuer Tests auf dem eigenen Rechner (Attrappe statt Close)
     $basis = getenv('AO_CLOSE_TEST') ?: 'https://api.close.com/api/v1/';
-    $ch = curl_init($basis . ltrim($pfad, '/'));
-    $kopf = ['Accept: application/json'];
-    if ($daten !== null) { $kopf[] = 'Content-Type: application/json'; curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($daten)); }
-    curl_setopt_array($ch, [
-        CURLOPT_CUSTOMREQUEST  => $methode,
-        CURLOPT_USERPWD        => ao_schluessel('close') . ':',
-        CURLOPT_HTTPHEADER     => $kopf,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CONNECTTIMEOUT => 5,
-        CURLOPT_TIMEOUT        => 12,
-    ]);
-    $antwort = curl_exec($ch);
-    $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $fehler = curl_error($ch);
-    curl_close($ch);
-    if ($antwort === false || $code < 200 || $code >= 300) {
-        throw new AoCloseFehler("$methode $pfad: HTTP $code " . ($fehler ?: mb_substr((string)$antwort, 0, 200)));
+    [$code, $antwort, $fehler] = ao_http($methode, $basis . ltrim($pfad, '/'),
+        ['Authorization: Basic ' . base64_encode(ao_schluessel('close') . ':')], $daten);
+    if ($code < 200 || $code >= 300) {
+        throw new AoCloseFehler("$methode " . strtok($pfad, '?') . ": HTTP $code " . ($fehler ?: mb_substr((string)$antwort, 0, 200)));
     }
     return json_decode($antwort, true) ?: [];
 }
@@ -93,6 +80,7 @@ function ao_close_lead_finden($email, $domain, $praxis) {
         }
     }
     // 3. Praxisname, genau gleich geschrieben
+    if (trim($praxis) === '') return null;
     foreach (ao_close_leads_suchen('"' . $praxis . '"') as $l) {
         if (ao_normal($l['display_name'] ?? '') === ao_normal($praxis)) return [$l, null, 'Praxisname'];
     }
@@ -135,8 +123,11 @@ function ao_close_eintragen($d) {
             $bericht = 'Neuer Lead angelegt: ' . $d['praxis'];
         }
 
-        // Aktivitaet "Magazin": vorhandene nutzen, sonst neu
-        $wert = $d['newsletter'] ? 'Ja' : 'Nein';
+        // Aktivitaet "Magazin": vorhandene nutzen, sonst neu.
+        // Mit Double-Opt-in steht "Mazagin" erst nach dem Klick in der
+        // Bestaetigungsmail auf Ja (magazin-bestaetigt.php).
+        $status = $d['newsletter_status'] ?? ($d['newsletter'] ? 'ja' : 'nein');
+        $wert = $status === 'ja' ? 'Ja' : 'Nein';
         $vorhanden = ao_close('GET', 'activity/custom/?' . http_build_query([
             'lead_id' => $leadId, 'custom_activity_type_id' => AO_CLOSE_TYP_MAGAZIN, '_limit' => 1,
         ]));
@@ -167,12 +158,41 @@ function ao_close_eintragen($d) {
         ao_close('POST', 'activity/note/', [
             'lead_id' => $leadId,
             'note'    => 'Teamprophylaxe-Magazin über die Webseite angefordert: ' . $d['ausgaben']
-                       . '. Newsletter: ' . ($d['newsletter'] ? 'ja' : 'nein') . '.'
+                       . '. Newsletter: ' . ($status === 'ausstehend' ? 'angefragt, Bestätigung per Mail ausstehend' : ($status === 'ja' ? 'ja' : 'nein')) . '.'
                        . ' Anrufen: ' . (!empty($d['anruf']) ? 'ja, ausdrücklich erlaubt' : 'nein, nur per E-Mail') . '.'
                        . ' Person: ' . $kontakt['name'] . ', ' . $d['email'] . ', ' . $d['telefon'] . '.',
         ]);
         return $bericht . '.' . "\n  https://app.close.com/lead/$leadId/";
     } catch (AoCloseFehler $e) {
         return 'FEHLER bei Close, bitte von Hand eintragen. (' . $e->getMessage() . ')';
+    }
+}
+
+// Nach dem Klick in der Bestaetigungsmail (Double-Opt-in): "Mazagin" auf Ja
+function ao_close_newsletter_bestaetigt($email) {
+    if (ao_schluessel('close') === '') return 'kein Schlüssel';
+    try {
+        $fund = ao_close_lead_finden($email, '', '');
+        if (!$fund) return 'Lead nicht gefunden';
+        $leadId = $fund[0]['id'];
+        $vorhanden = ao_close('GET', 'activity/custom/?' . http_build_query([
+            'lead_id' => $leadId, 'custom_activity_type_id' => AO_CLOSE_TYP_MAGAZIN, '_limit' => 1,
+        ]));
+        $akt = $vorhanden['data'][0] ?? null;
+        if ($akt) {
+            ao_close('PUT', 'activity/custom/' . $akt['id'] . '/', ['custom.' . AO_CLOSE_FELD_MAGAZIN => 'Ja']);
+        } else {
+            $akt = ao_close('POST', 'activity/custom/', [
+                'custom_activity_type_id' => AO_CLOSE_TYP_MAGAZIN, 'lead_id' => $leadId, 'contact_id' => $fund[1],
+                'status' => 'published', 'pinned' => true, 'custom.' . AO_CLOSE_FELD_MAGAZIN => 'Ja',
+            ]);
+        }
+        ao_close('POST', 'activity/note/', [
+            'lead_id' => $leadId,
+            'note'    => 'Newsletter Teamprophylaxe bestätigt (Double-Opt-in) am ' . date('d.m.Y H:i') . ' Uhr von ' . $email . '.',
+        ]);
+        return 'ok ' . $leadId;
+    } catch (AoCloseFehler $e) {
+        return 'FEHLER ' . $e->getMessage();
     }
 }
