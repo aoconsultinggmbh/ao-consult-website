@@ -13,7 +13,7 @@ if (!defined('AO_MAGAZIN')) { http_response_code(404); exit; }
 const AO_BREVO_ABSENDER      = 'service@ao-consult.de';
 const AO_BREVO_ABSENDER_NAME = 'AO Consulting · Teamprophylaxe';
 const AO_BREVO_LISTE_NAME    = 'Teamprophylaxe Magazin';   // wird bei Bedarf angelegt
-const AO_BREVO_DOI_VORLAGE   = 79;                          // Vorlage "Newsletter bestätigen (Double-Opt-in)"
+const AO_BREVO_DOI_VORLAGE   = 80;                          // Vorlage "Newsletter bestätigen (Double-Opt-in)"
 
 function ao_brevo_aktiv() { return ao_schluessel('brevo') !== ''; }
 
